@@ -1,0 +1,41 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
+ERROR - 2025-03-26 09:11:54 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:12:01 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:12:07 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:12:09 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:13:15 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:13:21 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:13:27 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:13:27 --> Could not find the language line "features"
+ERROR - 2025-03-26 09:13:40 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:13:40 --> Could not find the language line "features"
+ERROR - 2025-03-26 09:13:47 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:13:49 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:14:19 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:14:24 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:16:19 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:16:23 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:21:46 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:21:49 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:21:51 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:21:53 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:21:55 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:05 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:12 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:12 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:15 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:21 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:22 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:25 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:28 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:30 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:32 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:22:36 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:23:39 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 09:23:55 --> Could not find the language line "Order added"
+ERROR - 2025-03-26 03:24:55 --> Severity: error --> Exception: MySQL server has gone away /home/ionel/domains/ionel.themesic.com/public_html/system/database/drivers/mysqli/mysqli_driver.php 307
+ERROR - 2025-03-26 03:24:55 --> Severity: error --> Exception: MySQL server has gone away /home/ionel/domains/ionel.themesic.com/public_html/system/database/drivers/mysqli/mysqli_driver.php 307
+ERROR - 2025-03-26 03:25:10 --> Severity: error --> Exception: MySQL server has gone away /home/ionel/domains/ionel.themesic.com/public_html/system/database/drivers/mysqli/mysqli_driver.php 307
+ERROR - 2025-03-26 03:25:40 --> Severity: error --> Exception: MySQL server has gone away /home/ionel/domains/ionel.themesic.com/public_html/system/database/drivers/mysqli/mysqli_driver.php 307
+ERROR - 2025-03-26 03:26:25 --> Severity: error --> Exception: MySQL server has gone away /home/ionel/domains/ionel.themesic.com/public_html/system/database/drivers/mysqli/mysqli_driver.php 307

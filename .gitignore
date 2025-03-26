@@ -1,0 +1,43 @@
+# Ignore the main application "uploads" directory (user-generated content)
+uploads/*
+
+# Allow essential .htaccess files inside uploads (if needed)
+!uploads/.htaccess
+
+# Ignore cache and temporary files
+application/cache/*
+application/logs/*
+application/third_party/mpdf/tmp/*
+application/third_party/mpdf/ttfontdata/*
+
+# Ignore environment-specific configuration files
+.env
+*.env
+
+# Ignore compiled and temporary assets
+assets/cache/*
+assets/fonts/*
+assets/plugins/*
+
+# Ignore Node.js dependencies (if used)
+node_modules/
+
+# Ignore vendor dependencies (if using Composer)
+vendor/
+
+# Ignore Composer lock file (optional)
+composer.lock
+
+# Ignore IDE and system files
+.idea/
+.vscode/
+*.log
+*.bak
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Ignore database backups and exported files
+backup/*
+database_backups/
