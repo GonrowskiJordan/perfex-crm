@@ -665,11 +665,11 @@ class Mailbox extends AdminController
 		$this->load->view('mailbox/email_templates/modal', $data);
     }
 
-	public function change_email_template_status($id, $status)
+	public function update_email_template_status($id, $status)
 	{
         if ($this->input->is_ajax_request())
         {
-            $this->mailbox_model->change_email_template_status($id, $status);
+            $this->mailbox_model->update_email_template_status($id, $status);
         }
 	}
 
@@ -691,4 +691,20 @@ class Mailbox extends AdminController
 		}
 		redirect(admin_url('mailbox/email_templates'));
 	}
+
+    public function update_mail_tag($id, $tag_id = '', $type = 'outbox')
+    {
+        $message = _l('cant_find', _l('mailbox_tag'));
+
+        if ($id) {
+            $success = true;
+            $response = $this->mailbox_model->update_mail_tag($id, $tag_id, $type);
+            if ($response) {
+				$message = _l('updated_successfully', _l('mailbox_tag'));
+            }
+        }
+
+        echo json_encode(['success' => $success, 'message' => $message, 'id' => $id, 'tag_id' => $tag_id, 'type' => $type ]);
+        die;
+    }
 }

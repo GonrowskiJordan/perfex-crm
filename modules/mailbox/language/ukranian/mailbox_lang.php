@@ -73,3 +73,4 @@ $lang['mailbox_slug']												    = 'Слизняк';
 $lang['mailbox_reply_email_template']									= 'Шаблон листа-відповіді';
 $lang['mailbox_autoreply']									            = 'Автовідповідь';
 $lang['mailbox_scheduled_at']									        = 'Заплановано на';
+$lang['cant_find']                                                      = '%s не може знайти.';

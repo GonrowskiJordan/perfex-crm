@@ -73,3 +73,4 @@ $lang['mailbox_slug']												    = 'Lumaca';
 $lang['mailbox_reply_email_template']									= 'Modello di e-mail di risposta';
 $lang['mailbox_autoreply']									            = 'Automaatne vastus';
 $lang['mailbox_scheduled_at']									        = 'In programma a';
+$lang['cant_find']                                                      = '%s non si trova.';

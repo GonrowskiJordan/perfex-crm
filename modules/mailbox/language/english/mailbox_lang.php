@@ -73,3 +73,4 @@ $lang['delete_mailbox_email_template']									= 'Delete Email Template';
 $lang['mailbox_reply_email_template']									= 'Reply Email Template';
 $lang['mailbox_autoreply']									            = 'Auto Reply';
 $lang['mailbox_scheduled_at']									        = 'Scheduled At';
+$lang['cant_find']                                                      = '%s cant find.';

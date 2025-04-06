@@ -65,7 +65,7 @@ foreach ($rResult as $aRow) {
     $content = '<a href="'.admin_url().'mailbox/inbox/'.$aRow['id'].'">';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['sender_name'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment.'</a>';
-    $mail_tag_content = '<select class="mail-tag" data-id="'.$aRow['id'].'">';
+    $mail_tag_content = '<select class="mail-tag" data-id="'.$aRow['id'].'" data-type="inbox">';
     $mail_tag_content .= '<option></option>';
     foreach ($mail_tags as $mail_tag) {
         $mail_tag_content .= '<option data-id="'.$mail_tag['id'].'"'.($mail_tag['id']==$aRow['tag_id']?'selected':'').'>'.$mail_tag['name'].'</option>';

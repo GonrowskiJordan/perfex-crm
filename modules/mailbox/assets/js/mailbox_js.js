@@ -110,27 +110,6 @@ function enable_email_autocomplete() {
     });
 }
 
-    
-
-$('.mail-tag').change(function() {
-    let mail_id = $(this).data('id');
-    let tag_id = $(this).find('option:selected').data('id');
-    $.ajax({
-        type: 'POST',
-        data: {id: mail_id, tag_id: tag_id},
-        contentType: false,
-        cache: false,
-        processData: false,
-        url: '/admin/mainbox/change_mail_tag'
-    }).done(function(response) {
-        response = JSON.parse(response);
-        if (response.success) {
-            alert_float('success', response.message);
-        }
-    }).fail(function(error) {
-        alert_float('danger', JSON.parse(error.responseText));
-    });
-});
 function view_contact(contact_id) {
     if (!contact_id || typeof contact_id == 'undefined') {
         contact_id = '';

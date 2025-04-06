@@ -221,6 +221,25 @@
             email: 'required',
             mail_password: 'required',
         });
+        
+        $("body").on("change", ".table-mailbox .mail-tag", function (event, state) {
+            let mail_id = $(this).data('id');
+            let mail_type = $(this).data('type');
+            let tag_id = $(this).find('option:selected').data('id');
+            if (typeof tag_id === 'undefined') {
+                tag_id = 0;
+            }
+            $.ajax({
+                url: admin_url + 'mailbox/update_mail_tag/' + mail_id + '/' + tag_id + '/' + mail_type
+            }).done(function(response) {
+                response = JSON.parse(response);
+                if (response.success) {
+                    alert_float('success', response.message);
+                }
+            }).fail(function(error) {
+                alert_float('danger', JSON.parse(error.responseText));
+            });
+        });
     });
 </script>
 </body>

@@ -540,7 +540,7 @@ class Mailbox_model extends App_Model
         return true;
     }
 
-    public function change_email_template_status($id, $status)
+    public function update_email_template_status($id, $status)
     {
         $this->db->where('emailtemplateid', $id);
         $email_template = $this->db->get(db_prefix() . 'emailtemplates')->row();
@@ -588,6 +588,27 @@ class Mailbox_model extends App_Model
                 }
                 log_activity('Email Template Deleted [ID: ' . $email_template['emailtemplateid'] . ']');
             }
+        }
+
+        return $affectedRows ? true : false;
+    }
+
+    public function update_mail_tag($id, $tag_id, $type = 'outbox')
+    {
+        if ($tag_id) {
+            $this->db->where('id', $tag_id);
+            $email_tag = $this->db->get(db_prefix() . 'mail_tags')->row();
+        } else {
+            $tag_id = null;
+        }
+        $this->db->where('id', $id);
+        $email = $this->db->get(db_prefix() . 'mail_' . $type)->row();
+        $this->db->update(db_prefix() . 'mail_' . $type, ['tagid' => $tag_id, ]);
+        $affectedRows = 0;
+        if ($this->db->affected_rows() > 0) {
+            $affectedRows++;
+            hooks()->do_action('mailbox_tag_changed', ['id' => $email->id, 'tagid' => $tag_id, ]);
+            log_activity('Email Tag Changed [ID: ' . $email->id . (isset($email_tag) && $email_tag ? ' Tag: ' . $email_tag->name : '' ) . ']');
         }
 
         return $affectedRows ? true : false;
