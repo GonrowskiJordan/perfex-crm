@@ -1,5 +1,7 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed'); ?>
+
 <?php init_head(); ?>
+
 <div id="wrapper">
    <div class="content">
       <div class="row">
@@ -20,7 +22,7 @@
                   </div>
                   <div class="row mbot20">
                      <div class="col-md-12">
-					 <br>
+					         <br>
                         <button id="submit" type="submit" class="btn btn-primary">Click to activate ✔️</button>
                      </div>
                   </div><br>
@@ -62,8 +64,10 @@
 </div>
 
 <?php init_tail(); ?>
+
 <script type="text/javascript">
    "use strict";
+
    appValidateForm($('#verify-form'), {
       purchase_key: 'required',
       confirmation: 'required'
@@ -73,32 +77,31 @@
       }
    });
 
-function manage_verify_form(form) {
-   // Get and trim the value of the purchase_key input field
-   var purchaseKey = $('#purchase_key').val().trim();
-    
-   // Log the value to check if trimming is happening correctly
-   console.log("Trimmed Purchase Key: '" + purchaseKey + "'");
-   
-   // Set the trimmed value back to the input field
-   $('#purchase_key').val(purchaseKey);  
+   function manage_verify_form(form) {
+      // Get and trim the value of the purchase_key input field
+      var purchaseKey = $('#purchase_key').val().trim();
+      
+      // Log the value to check if trimming is happening correctly
+      console.log("Trimmed Purchase Key: '" + purchaseKey + "'");
+      
+      // Set the trimmed value back to the input field
+      $('#purchase_key').val(purchaseKey);  
 
-   // Disable the submit button and show loading icon
-   $("#submit").prop('disabled', true).prepend('<i class="fa fa-spinner fa-pulse"></i> ');
+      // Disable the submit button and show loading icon
+      $("#submit").prop('disabled', true).prepend('<i class="fa fa-spinner fa-pulse"></i> ');
 
-   // Send the form data using AJAX
-   $.post(form.action, $(form).serialize()).done(function(response) {
-      var response = $.parseJSON(response);
-      if (!response.status) {
-         alert_float("danger", response.message);
-      }
-      if (response.status) {
-         alert_float("success", "Activating your license..");
-         window.location.href = response.original_url;
-      }
-      // Enable the submit button and remove the loading icon
-      $("#submit").prop('disabled', false).find('i').remove();
-   });
-}
-
+      // Send the form data using AJAX
+      $.post(form.action, $(form).serialize()).done(function(response) {
+         var response = $.parseJSON(response);
+         if (!response.status) {
+            alert_float("danger", response.message);
+         }
+         if (response.status) {
+            alert_float("success", "Activating your license..");
+            window.location.href = response.original_url;
+         }
+         // Enable the submit button and remove the loading icon
+         $("#submit").prop('disabled', false).find('i').remove();
+      });
+   }
 </script>

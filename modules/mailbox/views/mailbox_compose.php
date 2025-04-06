@@ -105,12 +105,12 @@
             <a href="<?php echo admin_url().'mailbox'; ?>" class="btn btn-warning close-send-template-modal"><?php echo _l('cancel'); ?></a>       
         </div>
         <div class="pull-right">
-            <?php if (!isset($mail)) {?>
+            <?php if (!isset($mail)) { ?>
                 <button type="submit" name="sendmail" value="draft" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-primary">
                     <i class="fa fa-file menu-icon"></i> <?php echo _l('mailbox_save_draft'); ?>
                 </button>
             <?php } ?>
-            <?php if (isset($outbox_id)) {?>
+            <?php if (isset($outbox_id)) { ?>
                 <a class="btn btn-success" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data'); ?>"><i class="fa fa-life-ring"></i> <?php echo _l('assign_task'); ?></a>
                 <button class="btn btn-success" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>      
                 <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#ticket_item_modal"><i class="fa fa-life-ring"></i> <?php echo _l('assign_to_tickets'); ?></button>	  
