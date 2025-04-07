@@ -34,7 +34,9 @@ class Mailbox_model extends App_Model
         $outbox['body']            = _strip_tags($data['body']);
         $outbox['body']            = nl2br_save_html($outbox['body']);
         $outbox['date_sent']       = date('Y-m-d H:i:s');
-        $outbox['schedule_at']     = $data['schedule_at']->format('Y-m-d H:i:s');
+        $outbox['tagid']           = $data['tagid'];
+        $outbox['templateid']      = $data['templateid'];
+        $outbox['scheduled_at']    = to_sql_date($data['scheduled_at'], true);
         if (isset($data['reply_from_id'])) {
             $outbox['reply_from_id'] = $data['reply_from_id'];
         }
@@ -67,6 +69,8 @@ class Mailbox_model extends App_Model
         $inbox['date_received']      = date('Y-m-d H:i:s');
         $inbox['folder']             = 'inbox';
         $inbox['from_email']         = get_staff_email_by_id($staff_id);
+        $inbox['tagid']              = $data['tagid'];
+        $inbox['templateid']         = $data['templateid'];
 
         $array_send_to = [];
         $array_to      = explode(';', $data['to']);
@@ -112,10 +116,10 @@ class Mailbox_model extends App_Model
 
         if ($data['scheduled_at']) {
             $this->email_schedule_model->create($outbox_id, 'mail_outbox', [
-                'scheduled_at' => to_sql_date($data['schedule_at'], true),
+                'scheduled_at' => to_sql_date($data['scheduled_at'], true),
                 'cc'           => $data['cc'],
-                'contacts'     => $data['sent_to'],
-                'attach_pdf'   => count($attachments) ? 1 : 0,
+                'contacts'     => $data['to'],
+                'attach_pdf'   => $attachments && count($attachments) ? 1 : 0,
                 'template'     => 'mail_outbox',
             ]);
         } else {
@@ -137,6 +141,14 @@ class Mailbox_model extends App_Model
                     $ci->email->attach($attachment_url);
                 }
                 $ci->email->send(true);
+
+                if ($data['templateid']) {
+                    foreach ($mail_auto_replies as $mail_auto_reply) {
+                        if ($mail_auto_reply['receiveid'] == $data['templateid']) {
+
+                        }
+                    }
+                }
             }
         }
 
@@ -259,6 +271,17 @@ class Mailbox_model extends App_Model
     }
 
     /**
+     * Clients Data.
+     *
+     */
+    public function select_client()
+    {
+        $this->db->select('*');
+        $data = $this->db->get(db_prefix().'clients')->result_array();
+        return $data;
+    }
+
+    /**
      * Leads Data.
      *
      */
@@ -271,7 +294,7 @@ class Mailbox_model extends App_Model
         return $data;
     }
 
-    public function conversation($data){
+    public function conversation($data) {
         foreach($data['select_lead'] as $value) {
             $lead_mail = [];
             $lead_mail['outbox_id'] = $data['outbox_id'];
@@ -288,7 +311,7 @@ class Mailbox_model extends App_Model
         return true;
     }
 
-    public function conversation_inbox($data){
+    public function conversation_inbox($data) {
         foreach($data['select_lead'] as $value) {
             $lead_mail = [];
             $lead_mail['inbox_id'] = $data['inbox_id'];
@@ -305,15 +328,14 @@ class Mailbox_model extends App_Model
         return true;
     }
 
-    public function delete_mail_conversation($id){
+    public function delete_mail_conversation($id) {
         $this->db->where('id', $id);
         $this->db->delete(db_prefix() . 'mail_conversation');
         if ($this->db->affected_rows() > 0) {
             return true;
         }
         return false;    
-    }
-	
+    }	
 	
     /**
      * Tickets Data.
@@ -328,7 +350,7 @@ class Mailbox_model extends App_Model
         return $data;
     }
 	
-    public function conversationTicket($data){
+    public function conversationTicket($data) {
         foreach($data['select_ticket'] as $value) {
             $ticket_mail = [];
             $ticket_mail['outbox_id'] = $data['outbox_id'];
@@ -382,8 +404,8 @@ class Mailbox_model extends App_Model
         if ($search)
         {
             $this->db->where("LOWER(firstname) LIKE '%" . strtolower($search) . "%'");
-            $this->db->where("LOWER(lastname) LIKE '%" . strtolower($search) . "%'");
-            $this->db->where("LOWER(email) LIKE '%" . strtolower($search) . "%'");
+            $this->db->or_where("LOWER(lastname) LIKE '%" . strtolower($search) . "%'");
+            $this->db->or_where("LOWER(email) LIKE '%" . strtolower($search) . "%'");
         }
         
         return $this->db->get(db_prefix() . 'contacts')->result_array();
@@ -396,7 +418,7 @@ class Mailbox_model extends App_Model
      * @param  array $whereIn     perform whereIn query
      * @return array
      */
-    public function get_contacts($tag_id = '', $where = ['active' => 1], $whereIn = [])
+    public function get_tags($tag_id = '', $where = ['active' => 1], $whereIn = [])
     {
         $this->db->where($where);
         if ($tag_id != '') {
@@ -479,6 +501,12 @@ class Mailbox_model extends App_Model
         return false;
     }
 
+    /**
+     * Change mailbox tag status
+     * @param  mixed $id        tag id
+     * @param  mixed $status    tag status
+     * @return object
+     */
     public function change_tag_status($id, $status)
     {
         $status = hooks()->apply_filters('change_tag_status', $status, $id);
@@ -492,12 +520,47 @@ class Mailbox_model extends App_Model
         return false;
     }
 
+    /**
+     * Update mailbox tag
+     * @param  mixed $id        mail id
+     * @param  mixed $tag_id    tag id
+     * @param  mixed $type      type
+     * @return object
+     */
+    public function update_mail_tag($id, $tag_id, $type = 'outbox')
+    {
+        if ($tag_id) {
+            $this->db->where('id', $tag_id);
+            $email_tag = $this->db->get(db_prefix() . 'mail_tags')->row();
+        } else {
+            $tag_id = null;
+        }
+        $this->db->where('id', $id);
+        $email = $this->db->get(db_prefix() . 'mail_' . $type)->row();
+        $this->db->update(db_prefix() . 'mail_' . $type, ['tagid' => $tag_id, ]);
+        $affectedRows = 0;
+        if ($this->db->affected_rows() > 0) {
+            $affectedRows++;
+            hooks()->do_action('mailbox_tag_changed', ['id' => $email->id, 'tagid' => $tag_id, ]);
+            log_activity('Email Tag Changed [ID: ' . $email->id . (isset($email_tag) && $email_tag ? ' Tag: ' . $email_tag->name : '' ) . ']');
+        }
+
+        return $affectedRows ? true : false;
+    }
+
+    /**
+     * Delete mailbox tag
+     * @param  mixed $id        tag id
+     * @return object
+     */
     public function delete_tag($id)
     {
         $affectedRows = 0;
         hooks()->do_action('before_mailbox_tag_deleted', $id);
         $last_activity = get_last_system_activity_id();
-        $this->db->where('id', $id);
+        if ($id) {
+            $this->db->where('id', $id);
+        }
         $this->db->delete(db_prefix() . 'mail_tags');
         if ($this->db->affected_rows() > 0) {
             $affectedRows++;
@@ -515,6 +578,12 @@ class Mailbox_model extends App_Model
         return false;
     }
 
+    /**
+     * Update Email Template
+     * @param array  $data      $_POST data
+     * @param  mixed $id        email template id
+     * @return object
+     */
     public function update_email_template($data, $id)
     {
         $this->db->where('emailtemplateid', $id);
@@ -540,6 +609,12 @@ class Mailbox_model extends App_Model
         return true;
     }
 
+    /**
+     * Update Email Template Status
+     * @param  mixed $id        email template id
+     * @param  mixed $status    email template status
+     * @return object
+     */
     public function update_email_template_status($id, $status)
     {
         $this->db->where('emailtemplateid', $id);
@@ -562,6 +637,11 @@ class Mailbox_model extends App_Model
         return $affectedRows ? true : false;
     }
 
+    /**
+     * Delete Email Template
+     * @param  mixed $id        email template id
+     * @return object
+     */
     public function delete_email_templates($id)
     {
         $this->db->where('emailtemplateid', $id);
@@ -593,24 +673,146 @@ class Mailbox_model extends App_Model
         return $affectedRows ? true : false;
     }
 
-    public function update_mail_tag($id, $tag_id, $type = 'outbox')
+    /**
+     * Get auto replies
+     * @param  mixed $tag_id
+     * @param  array $where       perform where query
+     * @param  array $whereIn     perform whereIn query
+     * @return array
+     */
+    public function get_auto_replies($tag_id = '', $where = ['active' => 1], $whereIn = [])
     {
-        if ($tag_id) {
+        $this->db->where($where);
+        if ($tag_id != '') {
             $this->db->where('id', $tag_id);
-            $email_tag = $this->db->get(db_prefix() . 'mail_tags')->row();
-        } else {
-            $tag_id = null;
         }
+        foreach ($whereIn as $key => $values) {
+            if (is_string($key) && is_array($values)) {
+                $this->db->where_in($key, $values);
+            }
+        }
+        return $this->db->get(db_prefix() . 'mail_auto_replies')->result_array();
+    }
+
+    /**
+     * Get single mailbox auto reply
+     * @param  mixed $id auto reply id
+     * @return object
+     */
+    public function get_auto_reply($id = '')
+    {
         $this->db->where('id', $id);
-        $email = $this->db->get(db_prefix() . 'mail_' . $type)->row();
-        $this->db->update(db_prefix() . 'mail_' . $type, ['tagid' => $tag_id, ]);
-        $affectedRows = 0;
+        return $this->db->get(db_prefix() . 'mail_auto_replies')->row();
+    }
+
+    /**
+     * Add new mailbox auto reply
+     * @param array  $data               $_POST data
+     */
+    public function add_auto_reply($data)
+    {
+        if (isset($data['custom_fields'])) {
+            $custom_fields           = $data['custom_fields'];
+            unset($data['custom_fields']);
+        }
+        $data['name']                       = trim($data['name']);
+        $data                               = hooks()->apply_filters('before_create_mailbox_auto_reply', $data);
+        $this->db->insert(db_prefix() . 'mail_auto_replies', $data);
+        $auto_reply_id = $this->db->insert_id();
+        if ($auto_reply_id) {
+            if (isset($custom_fields)) {
+                handle_custom_fields_post($auto_reply_id, $custom_fields);
+            }
+            log_activity('Mailbox Auto Reply Created [ID: ' . $auto_reply_id . ']');
+            hooks()->do_action('mailbox_auto_reply_created', $auto_reply_id);
+            return $auto_reply_id;
+        }
+        return false;
+    }
+
+    /**
+     * Update mailbox auto reply data
+     * @param  array  $data           $_POST data
+     * @param  mixed  $id             auto reply id
+     * @return mixed
+     */
+    public function update_auto_reply($data, $id)
+    {
+        $affectedRows   = 0;
+        $auto_reply     = $this->get_auto_reply($id);
+        if (isset($data['custom_fields'])) {
+            $custom_fields = $data['custom_fields'];
+            if (handle_custom_fields_post($id, $custom_fields)) {
+                $affectedRows++;
+            }
+            unset($data['custom_fields']);
+        }
+        $data = hooks()->apply_filters('before_update_mailbox_auto_reply', $data, $id);
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix() . 'mail_auto_replies', $data);
         if ($this->db->affected_rows() > 0) {
             $affectedRows++;
-            hooks()->do_action('mailbox_tag_changed', ['id' => $email->id, 'tagid' => $tag_id, ]);
-            log_activity('Email Tag Changed [ID: ' . $email->id . (isset($email_tag) && $email_tag ? ' Tag: ' . $email_tag->name : '' ) . ']');
         }
+        if ($affectedRows > 0) {
+            hooks()->do_action('mailbox_auto_reply_updated', $id, $data);
+        }
+        if ($affectedRows > 0) {
+            log_activity('Mailbox Auto Reply Updated [ID: ' . $id . ']');
+            return true;
+        }
+        return false;
+    }
 
-        return $affectedRows ? true : false;
+    /**
+     * Change mailbox auto reply status
+     * @param  mixed $id        auto reply id
+     * @param  mixed $status    auto reply status
+     * @return object
+     */
+    public function change_auto_reply_status($id, $status)
+    {
+        $status = hooks()->apply_filters('change_auto_reply_status', $status, $id);
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix() . 'mail_auto_replies', ['active' => $status, ]);
+        if ($this->db->affected_rows() > 0) {
+            hooks()->do_action('mailbox_auto_reply_status_changed', ['id' => $id, 'status' => $status, ]);
+            log_activity('Mailbox Auto Reply Status Changed [ID: ' . $id . ' Status(Active/Inactive): ' . $status . ']');
+            return true;
+        }
+        return false;
+    }
+
+    public function assign_customers($data) {
+        foreach($data['select_customers'] as $value) {
+            $customer_mail = [];
+            $customer_mail['outbox_id'] = $data['outbox_id'];
+            $customer_mail['client_id'] = $value;
+            $this->db->select('*');
+            $this->db->where("outbox_id", $data['outbox_id']);
+            $this->db->where("client_id", $value);
+            $select_data = $this->db->get(db_prefix().'mail_clients')->result_array();
+            if (empty($select_data)) {
+               $this->db->insert(db_prefix().'mail_clients', $customer_mail);
+               $mail_customer_id = $this->db->insert_id();
+            }   
+        }
+        return true;
+    }
+
+    public function assign_customers_inbox($data) {
+        foreach($data['select_customers'] as $value) {
+            $customer_mail = [];
+            $customer_mail['inbox_id'] = $data['inbox_id'];
+            $customer_mail['client_id'] = $value;
+            $this->db->select('*');
+            $this->db->where("inbox_id", $data['inbox_id']);
+            $this->db->where("client_id", $value);
+            $select_data = $this->db->get(db_prefix().'mail_clients')->result_array();
+            if (empty($select_data)) {
+               $this->db->insert(db_prefix().'mail_clients', $customer_mail);
+               $mail_customer_id = $this->db->insert_id();
+            } 
+        }
+        return true;
     }
 }

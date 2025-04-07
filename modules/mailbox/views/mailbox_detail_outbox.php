@@ -46,6 +46,7 @@
     </div>
 
     <div class="pull-right">
+        <a class="btn btn-info" type="button" data-toggle="modal" data-target="#customers_item_modal"><i class="fa fa-user"></i> <?php echo _l('assign_customers'); ?></a>
         <a class="btn btn-danger" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data?email_subject=' . urlencode($inbox->subject) . '&email_body=' . urlencode($inbox->body)); ?>"><i class="fa fa-tasks"></i> <?php echo _l('assign_task'); ?></a>
         <button class="btn btn-success" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>      
         <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#ticket_item_modal"><i class="fa fa-life-ring"></i> <?php echo _l('assign_to_tickets'); ?></button>	  
@@ -64,13 +65,59 @@
     var mailtype = '<?php echo $type; ?>';
 </script> 
 
-<div class="modal fade" id="sales_item_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="customers_item_modal" tabindex="-1" role="dialog" aria-labelledby="customersItemModalLabel">
+    <?php echo form_open_multipart(admin_url().'mailbox/assign_customers', ['id'=>'customer_assign_form']); ?>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="customersItemModalLabel">
+                    <span class="edit-title"><?php echo _l('assign_customers'); ?></span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-warning affect-warning hide">
+                            <?php echo _l('changing_items_affect_warning'); ?>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div id="customers">
+                                        <?php
+                                            $selected = [];
+                                            if (is_admin()) {
+                                                echo render_select_with_input_group('select_customers[]', $clients, ['userid', 'company'], 'select_customers', $selected, '<div class="input-group-btn"><a href="#" class="btn btn-default" data-toggle="modal" data-target="#customer_group_modal"><i class="fa fa-plus"></i></a></div>', ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
+                                            } else {
+                                                echo render_select('select_customers[]', $clients, ['userid', 'company'], 'select_customers', $selected, ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
+                                            }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="inbox_id" value="<?php echo $inbox_id ?>" >
+                        <div class="clearfix mbot15"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+                <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+            </div>
+        </div>
+    </div>
+    <?php echo form_close(); ?>
+</div>
+
+<div class="modal fade" id="sales_item_modal" tabindex="-1" role="dialog" aria-labelledby="salesItemModalLabel">
     <?php echo form_open_multipart(admin_url().'mailbox/conversationLead', ['id'=>'lead_assign_form']); ?>
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">
+                <h4 class="modal-title" id="salesItemModalLabel">
                     <span class="edit-title"><?php echo _l('assign_lead'); ?></span>
                 </h4>
             </div>
@@ -110,12 +157,12 @@
     <?php echo form_close(); ?>
 </div>
 
-<div class="modal fade" id="customer_group_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="customer_group_modal" tabindex="-1" role="dialog" aria-labelledby="customerGroupModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button group="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">
+                <h4 class="modal-title" id="customerGroupModalLabel">
                     <span class="edit-title"><?php echo _l('customer_group_edit_heading'); ?></span>
                     <span class="add-title"><?php echo _l('add_new', _l('lead_lowercase')); ?></span>
                 </h4>
@@ -153,22 +200,21 @@
                 email: true
             }
         }, manage_customer_groups);
-            $('#customer_group_modal').on('show.bs.modal', function(e) {
-                var invoker = $(e.relatedTarget);
-                var group_id = $(invoker).data('id');
-                $('#customer_group_modal .add-title').removeClass('hide');
-                $('#customer_group_modal .edit-title').addClass('hide');
-                $('#customer_group_modal input[name="id"]').val('');
-                $('#customer_group_modal input[name="name"]').val('');
-                // is from the edit button
-                if (typeof(group_id) !== 'undefined') {
-                    $('#customer_group_modal input[name="id"]').val(group_id);
-                    $('#customer_group_modal .add-title').addClass('hide');
-                    $('#customer_group_modal .edit-title').removeClass('hide');
-                    $('#customer_group_modal input[name="name"]').val($(invoker).parents('tr').find('td').eq(0).text());
-                }
+        $('#customer_group_modal').on('show.bs.modal', function(e) {
+            var invoker = $(e.relatedTarget);
+            var group_id = $(invoker).data('id');
+            $('#customer_group_modal .add-title').removeClass('hide');
+            $('#customer_group_modal .edit-title').addClass('hide');
+            $('#customer_group_modal input[name="id"]').val('');
+            $('#customer_group_modal input[name="name"]').val('');
+            // is from the edit button
+            if (typeof(group_id) !== 'undefined') {
+                $('#customer_group_modal input[name="id"]').val(group_id);
+                $('#customer_group_modal .add-title').addClass('hide');
+                $('#customer_group_modal .edit-title').removeClass('hide');
+                $('#customer_group_modal input[name="name"]').val($(invoker).parents('tr').find('td').eq(0).text());
             }
-        );
+        });
     });
     function manage_customer_groups(form) {
         var data = $(form).serialize();
@@ -182,7 +228,6 @@
                     $('.table-customer-groups').DataTable().ajax.reload();
                 }
                 if ($('body').hasClass('dynamic-create-groups') && typeof(response.id) != 'undefined') {
-                    console.log(data);
                     var groups = $('select[name="select_lead[]"]');
                     groups.prepend('<option value="'+response.id+'">'+nameValue+'</option>');
                     groups.selectpicker('refresh');
@@ -195,13 +240,13 @@
     }
 </script>
 
-<div class="modal fade" id="ticket_item_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="ticket_item_modal" tabindex="-1" role="ticketItemModalLabel">
     <?php echo form_open_multipart(admin_url().'mailbox/conversationTicket', ['id'=>'ticket_assign_form']); ?>
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">
+                <h4 class="modal-title" id="ticketItemModalLabel">
                     <span class="edit-title"><?php echo _l('assign_ticket'); ?></span>
                 </h4>
             </div>
@@ -246,13 +291,13 @@
     <?php echo form_close(); ?>
 </div>
 
-<div class="modal fade" id="task_item_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="task_item_modal" tabindex="-1" role="dialog" aria-labelledby="taskItemModalLabel">
     <?php echo form_open_multipart(admin_url().'mailbox/conversationTask', ['id'=>'task_assign_form']); ?>
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">
+                <h4 class="modal-title" id="taskItemModalLabel">
                     <span class="edit-title"><?php echo _l('assign_task'); ?></span>
                 </h4>
             </div>
@@ -295,12 +340,12 @@
     <?php echo form_close(); ?>
 </div>
 
-<div class="modal fade" id="customer_group_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="customer_group_modal" tabindex="-1" role="dialog" aria-labelledby="customerGroupModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button group="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">
+                <h4 class="modal-title" id="customerGroupModalLabel">
                     <span class="edit-title"><?php echo _l('customer_group_edit_heading'); ?></span>
                     <span class="add-title"><?php echo _l('add_new', _l('ticket_lowercase')); ?></span>
                 </h4>
@@ -328,7 +373,7 @@
 </div>
 
 <script>
-    window.addEventListener('load',function() {
+    window.addEventListener('load', function() {
         appValidateForm($('#customer-group-modal'), {
             name: 'required',
             email: 'required'

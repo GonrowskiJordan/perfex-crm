@@ -70,8 +70,9 @@ function enable_email_autocomplete() {
         let receipt_keyword = $(receipt_el).val();
         if (receipt_keyword) {
             $.ajax({
-                url: admin_url + "mailbox/get_recipients/" + $(receipt_el).val(),
-                type: "GET",
+                type: "POST",
+                url: admin_url + "mailbox/get_recipients/",
+                data: { keyword: receipt_keyword },
                 success: function(response) {
                     let receipts = JSON.parse(response);
                     let recipients_html = '';
@@ -79,9 +80,12 @@ function enable_email_autocomplete() {
                         recipients_html += '<div class="receipt" data-email="' + receipts[receipt_index].email + '">' + receipts[receipt_index].email + '(' + receipts[receipt_index].firstname + ' ' + receipts[receipt_index].lastname + ' - ' + receipts[receipt_index].company + ')</div>';
                     }
                     if ($(receipt_el).closest('.email-autocomplete').find('.receipts').length) {
-                        $(receipt_el).closest('.email-autocomplete').find('.receipts').html(recipients_html).addClass('active');
+                        $(receipt_el).closest('.email-autocomplete').find('.receipts').html(recipients_html);
+                        if (recipients_html) {
+                            $(receipt_el).closest('.email-autocomplete').find('.receipts').addClass('active');
+                        }
                     } else {
-                        $(receipt_el).closest('.email-autocomplete').append('<div class="receipts active">' + recipients_html + '</div>');
+                        $(receipt_el).closest('.email-autocomplete').append('<div class="receipts' + (recipients_html ? ' active' : '') + '">' + recipients_html + '</div>');
                     }
                     $('.email-autocomplete .receipts .receipt').click(function() {
                         $('.email-autocomplete input').val($(this).data('email'));
@@ -283,6 +287,77 @@ $('#mailbox_compose_form [name="templateid"]').change(function() {
     }
 });
 
+function mailboxAutoReplyFormHandler(form) {
+    var formURL = $(form).attr("action");
+
+    var formData = new FormData($(form)[0]);
+
+    $.ajax({
+        type: 'POST',
+        data: formData,
+        mimeType: "multipart/form-data",
+        contentType: false,
+        cache: false,
+        processData: false,
+        url: formURL
+    }).done(function(response) {
+        response = JSON.parse(response);
+        if (response.success) {
+            alert_float('success', response.message);
+        }
+
+        if ($.fn.DataTable.isDataTable('.table-mailbox-auto-replies')) {
+            $('.table-mailbox-auto-replies').DataTable().ajax.reload(null, false);
+        }
+
+        $('#autoReplyModal').modal('hide');
+    }).fail(function(error) {
+        alert_float('danger', JSON.parse(error.responseText));
+    });
+
+    return false;
+}
+
+function validate_mailbox_auto_reply_form() {
+    appValidateForm('#mailbox-auto-reply-form', {
+        name: 'required',
+        receiveid: 'required',
+        replyid: 'required',
+    }, mailboxAutoReplyFormHandler);
+}
+
+function view_mailbox_auto_reply(auto_reply_id) {
+    if (!auto_reply_id || typeof auto_reply_id == 'undefined') {
+        auto_reply_id = '';
+    }
+    requestGet('mailbox/form_auto_reply/' + auto_reply_id).done(function(response) {
+        $('#autoReplyModal .modal-content').html(response);
+        $('#autoReplyModal').modal({
+            show: true,
+            backdrop: 'static'
+        });
+
+        $('body').off('shown.bs.modal', '#mailbox-auto-reply-form');
+
+        $('body').on('shown.bs.modal', '#mailbox-auto-reply-form', function() {
+            if (auto_reply_id == '') {
+                $('#mailbox-auto-reply-form').find('input[name="name"]').focus();
+            }
+        });
+
+        init_selectpicker();
+        init_datepicker();
+        custom_fields_hyperlink();
+        validate_mailbox_auto_reply_form();
+    }).fail(function(error) {
+        var response = JSON.parse(error.responseText);
+
+        alert_float('danger', response.message);
+    });
+}
+
 $(document).ready(function() {
     enable_email_autocomplete();
+
+    initDataTable('.table-mailbox-clients', admin_url + 'mailbox/table_client_emails/' + mailbox_client_id, undefined, 'undefined', [0, 'asc']);
 });

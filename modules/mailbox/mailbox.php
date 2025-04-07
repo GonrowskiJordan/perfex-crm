@@ -29,6 +29,7 @@ hooks()->add_action('admin_init', 'mailbox_module_init_menu_items');
 hooks()->add_filter('migration_tables_to_replace_old_links', 'mailbox_migration_tables_to_replace_old_links');
 hooks()->add_action('after_lead_lead_tabs', 'mailbox_after_lead_lead_tabs');
 hooks()->add_action('after_lead_tabs_content', 'mailbox_after_lead_tabs_content');
+hooks()->add_action('customer_profile_tabs', 'customer_profile_tabs');
 
 /**
  * Injects chat CSS.
@@ -104,6 +105,13 @@ function mailbox_module_init_menu_items()
             'position' => 4,
             'badge'    => [],
         ]);
+        $CI->app_menu->add_sidebar_children_item('mailbox', [
+            'slug'     => 'mailbox-auto-replies',
+            'name'     => _l('mailbox_auto_replies'),
+            'href'     => admin_url('mailbox/auto_replies'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
     }
 }
 
@@ -163,6 +171,13 @@ function scan_email_server()
         $CI = &get_instance();
         $CI->db->select()->from(db_prefix() . 'staff')->where(db_prefix() . 'staff.mail_password !=', '');
         $staffs = $CI->db->get()->result_array();
+        
+        $CI->db->select()->from(db_prefix() . 'mail_inbox')->where(db_prefix() . 'mail_inbox.auto_reply', true);
+        $inbox_mails = $CI->db->get()->result_array();
+        
+        $CI->db->select()->from(db_prefix() . 'mail_auto_replies')->where(db_prefix() . 'mail_auto_replies.active', true);
+        $mail_auto_replies = $CI->db->get()->result_array();
+
         require_once __DIR__ . '/third_party/php-imap/Imap.php';
         include_once __DIR__ . '/third_party/simple_html_dom.php';
         foreach ($staffs as $staff) {
@@ -348,6 +363,43 @@ function scan_email_server()
 
                     if ($inbox_id) {
                         $imap->setUnseenMessage($email['uid']);
+                    }
+                }
+            }
+        }
+        
+        foreach ($inbox_mails as $inbox_mail) {
+            if ($inbox_mail['from_staff_id']) {
+                foreach ($mail_auto_replies as $mail_auto_reply) {
+                    if ($inbox_mail['templateid'] == $mail_auto_reply['receiveid']) {
+                        $CI->email->initialize();
+                        $CI->load->library('email');
+                        $CI->email->clear(true);
+                        
+                        $CI->db->select()->from(db_prefix() . 'staff')->where(db_prefix() . 'staff.staffid', $inbox_mail['from_staff_id']);
+                        $from_staff = $CI->db->get()->row();
+
+                        $CI->db->select()->from(db_prefix() . 'staff')->where(db_prefix() . 'staff.staffid', $inbox_mail['to_staff_id']);
+                        $to_staff = $CI->db->get()->row();
+
+                        $CI->email->from($to_staff->email, get_staff_full_name($inbox_mail['to_staff_id']));
+                        $CI->email->to(str_replace(';', ',', $from_staff->email));
+                        $CI->email->subject($inbox_mail->subject);
+                        $CI->email->message($inbox_mail->body);
+                        $inobx_attach_dir = module_dir_url(MAILBOX_MODULE).'uploads/inbox/'.$in_id;
+                        if (file_exists($inobx_attach_dir)) {
+                            $inobx_files = scandir($inobx_attach_dir);
+                            $inobx_files = array_diff($inobx_files, array(".", ".."));
+                            foreach ($inobx_files as $inobx_file) {
+                                $CI->email->attach($inobx_attach_dir.'/'.$inobx_file);
+                            }
+                        }
+                        $CI->email->send(true);
+
+                        $CI->db->where('id', $inbox_mail['id']);
+                        $CI->db->update(db_prefix().'mail_inbox', [
+                            'auto_reply' => false,
+                        ]);
                     }
                 }
             }
@@ -546,3 +598,18 @@ function mailbox_hide_support_extension() {
 }
 
 hooks()->add_action('app_admin_footer', 'mailbox_hide_support_extension');
+
+function customer_profile_tabs($tabs) {
+    $tabs['mail'] = [
+        'slug' => 'email',
+        'name' => 'eMails',
+        'icon' => 'fa fa-user-circle',
+        'view' => 'mailbox/mailbox_clients',
+        'position' => '150',
+        'badge' => [],
+        'href' => 'admin/mailbox/client_mails',
+        'children' => [],
+    ];
+
+    return $tabs;
+}

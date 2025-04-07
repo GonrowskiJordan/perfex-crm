@@ -4,17 +4,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $aColumns = [
     db_prefix() . 'mail_inbox.to',
-    'sender_name',
-    'subject',
-    'date_received',
+    db_prefix() . 'mail_inbox.sender_name',
+    db_prefix() . 'mail_inbox.subject',
+    db_prefix() . 'mail_inbox.date_received',
     db_prefix() . 'mail_tags.id as tag_id',
     db_prefix() . 'mail_tags.name as tag_name',
+    db_prefix() . 'emailtemplates.emailtemplateid as template_id',
+    db_prefix() . 'emailtemplates.name as template_name',
 ];
 
 $sIndexColumn = 'id';
 $sTable       = db_prefix() . 'mail_inbox';
 
-$join = ['LEFT JOIN ' . db_prefix() . 'mail_tags ON ' . db_prefix() . 'mail_tags.id = ' . db_prefix() . 'mail_inbox.tagid'];
+$join = [
+    'LEFT JOIN ' . db_prefix() . 'mail_tags ON ' . db_prefix() . 'mail_tags.id = ' . db_prefix() . 'mail_inbox.tagid',
+    'LEFT JOIN ' . db_prefix() . 'emailtemplates ON ' . db_prefix() . 'emailtemplates.emailtemplateid = ' . db_prefix() . 'mail_inbox.templateid'
+];
 $where = [];
 array_push($where, 'AND to_staff_id = '.get_staff_user_id());
 if ($group == 'inbox') {
@@ -26,7 +31,17 @@ if ($group == 'inbox') {
 } else if ($group == 'trash') {
     array_push($where, ' AND trash = 1');
 }
-$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [db_prefix() . 'mail_inbox.id',db_prefix() . 'mail_inbox.has_attachment',db_prefix() . 'mail_inbox.stared',db_prefix() . 'mail_inbox.important',db_prefix() . 'mail_inbox.body',db_prefix() . 'mail_inbox.read']);
+$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
+    db_prefix() . 'mail_inbox.id',
+    db_prefix() . 'mail_inbox.has_attachment',
+    db_prefix() . 'mail_inbox.stared',
+    db_prefix() . 'mail_inbox.important',
+    db_prefix() . 'mail_inbox.sender_name',
+    db_prefix() . 'mail_inbox.body',
+    db_prefix() . 'mail_inbox.read',
+    db_prefix() . 'mail_inbox.subject',
+    db_prefix() . 'mail_inbox.date_received'
+]);
 
 $mail_tags = get_mail_tags();
 
@@ -59,12 +74,12 @@ foreach ($rResult as $aRow) {
 
     $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>
                 <a class="btn btnIcon" data-toggle="tooltip" title="" data-original-title="'. $msg_starred.'" onclick="update_field(\''.$group.'\',\'starred\','.$aRow['stared'].','.$aRow['id'].');"><i class="fa '.$starred.' grey"></i></a>
-                <a class="btn btnIcon" data-toggle="tooltip" title="" data-original-title="'. $msg_important.'" onclick="update_field(\''.$group.'\',\'important\','.$aRow['important'].','.$aRow['id'].');"><i class="fa '.$important.' grey"></i></a>                
+                <a class="btn btnIcon" data-toggle="tooltip" title="" data-original-title="'. $msg_important.'" onclick="update_field(\''.$group.'\',\'important\','.$aRow['important'].','.$aRow['id'].');"><i class="fa '.$important.' grey"></i></a>
                 <a class="btn btnIcon" data-toggle="tooltip" title="" data-original-title="'. _l('mailbox_delete').'" onclick="update_field(\''.$group.'\',\'trash\',1,'.$aRow['id'].');"><i class="fa fa-trash grey"></i></a>';
 
     $content = '<a href="'.admin_url().'mailbox/inbox/'.$aRow['id'].'">';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['sender_name'].'</span></a>';
-    $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment.'</a>';
+    $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].($has_attachment ? ' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment : '').'</a>';
     $mail_tag_content = '<select class="mail-tag" data-id="'.$aRow['id'].'" data-type="inbox">';
     $mail_tag_content .= '<option></option>';
     foreach ($mail_tags as $mail_tag) {
@@ -72,6 +87,7 @@ foreach ($rResult as $aRow) {
     }
     $mail_tag_content .= '</select>';
     $row[] = $mail_tag_content;
+    $row[] = $content.'<span>'._dt($aRow['template_name']).'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'._dt($aRow['date_received']).'</span></a>';
 
     $output['aaData'][] = $row;

@@ -71,9 +71,9 @@ if (!$CI->db->table_exists(db_prefix().'mail_attachment')) {
 
 if (!$CI->db->table_exists(db_prefix() . 'mail_conversation')) {
   $CI->db->query('CREATE TABLE `' . db_prefix() . 'mail_conversation` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-      `outbox_id` int(255) DEFAULT NULL,
-      `lead_id` int(255) DEFAULT NULL,
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `outbox_id` int(255) DEFAULT NULL,
+    `lead_id` int(255) DEFAULT NULL,
     PRIMARY KEY (`id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=' . $CI->db->char_set . ';');
 }
@@ -85,6 +85,27 @@ if (!$CI->db->table_exists(db_prefix().'mail_tags')) {
     `active` tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=".$CI->db->char_set.';');
+}
+
+if (!$CI->db->table_exists(db_prefix().'mail_auto_replies')) {
+  $CI->db->query('CREATE TABLE `'.db_prefix()."mail_auto_replies` (
+    `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` varchar(127) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+    `receiveid` int(11) UNSIGNED,
+    `replyid` int(11) UNSIGNED,
+    `active` tinyint(1) NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=".$CI->db->char_set.';');
+}
+
+if (!$CI->db->table_exists(db_prefix() . 'mail_clients')) {
+  $CI->db->query('CREATE TABLE `' . db_prefix() . 'mail_clients` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `outbox_id` int(255) DEFAULT NULL,
+    `inbox_id` int(255) DEFAULT NULL,
+    `client_id` int(255) DEFAULT NULL,
+    PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=' . $CI->db->char_set . ';');
 }
 
 if (!$CI->db->field_exists('draft', 'mail_outbox')) {
@@ -99,6 +120,10 @@ if (!$CI->db->field_exists('tagid', 'mail_inbox')) {
   $CI->db->query('ALTER TABLE `'.db_prefix().'mail_inbox` ADD COLUMN `tagid` int(11);');
 }
 
+if (!$CI->db->field_exists('auto_reply', 'mail_inbox')) {
+  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_inbox` ADD COLUMN `auto_reply` tinyint(1) NOT NULL DEFAULT "0"');
+}
+
 if (!$CI->db->field_exists('templateid', 'mail_outbox')) {
   $CI->db->query('ALTER TABLE `'.db_prefix().'mail_outbox` ADD COLUMN `templateid` int(11);');
 }
@@ -107,8 +132,8 @@ if (!$CI->db->field_exists('templateid', 'mail_inbox')) {
   $CI->db->query('ALTER TABLE `'.db_prefix().'mail_inbox` ADD COLUMN `templateid` int(11);');
 }
 
-if (!$CI->db->field_exists('schedule_at', 'mail_outbox')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_outbox` ADD COLUMN `schedule_at` datetime;');
+if (!$CI->db->field_exists('scheduled_at', 'mail_outbox')) {
+  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_outbox` ADD COLUMN `scheduled_at` datetime;');
 }
 
 if (!$CI->db->field_exists('replyid', 'emailtemplates')) {

@@ -29,11 +29,11 @@
 
             <div class="form-group" app-field-wrapper="active">
                 <label for="active" class="control-label"> 
-                    <?= _l('mailbox_tag_active') ?>
+                    <?= _l('mailbox_active') ?>
                 </label>
                 <div class="onoffswitch">
-                    <input type="checkbox" name="active" class="onoffswitch-checkbox" id="t_m_<?= $tag_id ?>" data-id="<?= $tag_id ?>" <?= (isset($tag) ? ($tag->active ? 'checked' : '') : 'checked') ?>>
-                    <label class="onoffswitch-label" for="t_m_<?= $tag_id ?>"></label>
+                    <input type="checkbox" name="active" class="onoffswitch-checkbox" id="mt_<?= $tag_id ?>" data-id="<?= $tag_id ?>" <?= (isset($tag) ? ($tag->active ? 'checked' : '') : 'checked') ?>>
+                    <label class="onoffswitch-label" for="mt_<?= $tag_id ?>"></label>
                 </div>
             </div>
         </div>

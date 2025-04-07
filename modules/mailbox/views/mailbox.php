@@ -21,13 +21,13 @@
                             <i class="fa fa-inbox menu-icon" aria-hidden="true"></i>
                             <?php echo _l('mailbox_inbox'); ?>
                             <?php
-                                $num_unread = total_rows(db_prefix().'mail_inbox', ['read' => '0', 'to_staff_id' => get_staff_user_id()]);
+                                $num_unread = total_rows(db_prefix().'mail_inbox', ['read' => '0', 'to_staff_id' => get_staff_user_id(), 'trash' => '0']);
                                 if ($num_unread > 0) { ?>
                                     <span class="badge menu-badge bg-warning"><?php echo $num_unread; ?></span>
                                 <?php
                                 }  ?>
                             <?php
-                                $num_read = total_rows(db_prefix().'mail_inbox', ['read' => '1', 'to_staff_id' => get_staff_user_id()]);
+                                $num_read = total_rows(db_prefix().'mail_inbox', ['read' => '1', 'to_staff_id' => get_staff_user_id(), 'trash' => '0']);
                             ?>
                             <span class="badge menu-badge bg-neutral"><?php echo $num_read; ?></span>
                         </a>
@@ -182,9 +182,19 @@
                                                 'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-tag'],
                                             ],
                                             [
-                                                'name'    => _l('mailbox_date'),
-                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-date'],
-                                            ],
+                                                'name'    => _l('email_template'),
+                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-template'],
+                                            ]
+                                        ];
+                                        if ('sent' == $group || 'draft' == $group) {
+                                            $_table_data[] = [
+                                                'name'    => _l('mailbox_scheduled_at'),
+                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-scheduled-at'],
+                                            ];
+                                        }
+                                        $_table_data[] = [
+                                            'name'    => _l('mailbox_date'),
+                                            'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-date'],
                                         ];
                                         foreach ($_table_data as $_t) {
                                             array_push($table_data, $_t);

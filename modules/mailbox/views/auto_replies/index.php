@@ -9,9 +9,9 @@
                 <div class="panel_s">
                     <div class="panel-body">
                         <div class="inline-block new-tag-wrapper">
-                            <a href="#" onclick="view_mailbox_tag(); return false;" class="btn btn-primary new-tag mbot15">
+                            <a href="#" onclick="view_mailbox_auto_reply(); return false;" class="btn btn-primary new-tag mbot15">
                                 <i class="fa-regular fa-plus tw-mr-1"></i>
-                                <?= _l('new_mailbox_tag'); ?>
+                                <?= _l('new_mailbox_auto_reply'); ?>
                             </a>
                         </div>
 
@@ -20,17 +20,19 @@
                         <?php
                             $table_data = [
                                 _l('name'),
+                                _l('mailbox_receive_template'),
+                                _l('mailbox_reply_template'),
                                 [
                                     'name' => _l('mailbox_active'),
                                     'th_attrs' => ['class' => 'text-center']
                                 ]
                             ];
-                            $custom_fields = get_custom_fields('mail_tags', ['show_on_table' => 1]);
+                            $custom_fields = get_custom_fields('mail_auto_replies', ['show_on_table' => 1]);
                             foreach ($custom_fields as $field)
                             {
                                 array_push($table_data, ['name' => $field['name'], 'th_attrs' => ['data-type' => $field['type'], 'data-custom-field' => 1], ]);
                             }
-                            render_datatable($table_data, 'mailbox-tags');
+                            render_datatable($table_data, 'mailbox-auto-replies');
                         ?>
                     </div>
                 </div>
@@ -41,7 +43,7 @@
 
 <?php init_tail(); ?>
 
-<div class="modal fade" id="tagModal" tabindex="-1" role="dialog" aria-labelledby="tagModalLabel">
+<div class="modal fade" id="autoReplyModal" tabindex="-1" role="dialog" aria-labelledby="autoReplyModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
         </div>
@@ -50,9 +52,9 @@
 
 <script>
     $(function() {
-        initDataTable('.table-mailbox-tags', window.location.href, undefined, 'undefined', [0, 'asc']);
+        initDataTable('.table-mailbox-auto-replies', window.location.href, undefined, 'undefined', [0, 'asc']);
 
-        $("body").on("change", ".table-mailbox-tags .onoffswitch input", function (event, state) {
+        $("body").on("change", ".table-mailbox-auto-replies .onoffswitch input", function (event, state) {
             var switch_url = $(this).data("switch-url");
 
             if (!switch_url) {

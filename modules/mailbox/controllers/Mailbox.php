@@ -63,6 +63,11 @@ class Mailbox extends AdminController
             }
         }
 
+		$data['email_templates'] = $this->emails_model->get([
+            'language' => 'english',
+            'active' => true,
+        ]);
+
         if (isset($outbox_id)) {
             $mail         = $this->mailbox_model->get($outbox_id, 'outbox');
             $data['mail'] = $mail;
@@ -104,16 +109,17 @@ class Mailbox extends AdminController
     {
         $inbox = $this->mailbox_model->get($id, 'inbox');
         $this->mailbox_model->update_field('detail', 'read', 1, $id, 'inbox');
-        $data['title']       = $inbox->subject;
-        $group               = 'detail';
-        $data['group']       = $group;
-        $data['inbox']       = $inbox;
-        $data['type']        = 'inbox';
-        $data['attachments'] = $this->mailbox_model->get_mail_attachment($id, 'inbox');
-        $data['leads'] =  $this->mailbox_model->select_lead();
-        $data['tickets'] =  $this->mailbox_model->select_ticket();
-        $data['inbox_id'] = $id;
-        $data['bodyclass'] = 'dynamic-create-groups';
+        $data['title']          = $inbox->subject;
+        $group                  = 'detail';
+        $data['group']          = $group;
+        $data['inbox']          = $inbox;
+        $data['type']           = 'inbox';
+        $data['attachments']    = $this->mailbox_model->get_mail_attachment($id, 'inbox');
+        $data['clients']        = $this->mailbox_model->select_client();
+        $data['leads']          = $this->mailbox_model->select_lead();
+        $data['tickets']        =  $this->mailbox_model->select_ticket();
+        $data['inbox_id']       = $id;
+        $data['bodyclass']      = 'dynamic-create-groups';
         $this->load->view('mailbox', $data);
     }
 
@@ -234,7 +240,7 @@ class Mailbox extends AdminController
             $data = $this->input->post();
             $this->load->model('mailbox_model');
             $leadData = $this->mailbox_model->conversation($data);
-            if ($leadData) {                
+            if ($leadData) {
                 set_alert('success', _l('lead_assign_successfully'));
                 redirect(admin_url('mailbox/outbox/'.$data['outbox_id']));
             }
@@ -246,7 +252,7 @@ class Mailbox extends AdminController
             $data = $this->input->post();
             $this->load->model('mailbox_model');
             $leadData = $this->mailbox_model->conversation_inbox($data);
-            if ($leadData) {                
+            if ($leadData) {
                 set_alert('success', _l('lead_assign_successfully'));
                 redirect(admin_url('mailbox/inbox/'.$data['inbox_id']));
             }
@@ -274,7 +280,7 @@ class Mailbox extends AdminController
             $data = $this->input->post();
             $this->load->model('mailbox_model');
             $ticketData = $this->mailbox_model->conversationTicket($data);
-            if ($ticketData) {                
+            if ($ticketData) {
                 set_alert('success', _l('ticket_assign_successfully'));
                 redirect(admin_url('mailbox/outbox/'.$data['outbox_id']));
             }
@@ -336,7 +342,12 @@ class Mailbox extends AdminController
         redirect(admin_url('tasks')); // Redirect to the task list page
     }
 
-    public function get_recipients($keyword) {
+    public function get_recipients() {
+        $post_data = $this->input->post();
+        $keyword = '';
+        if (isset($post_data['keyword'])) {
+            $keyword = $post_data['keyword'];
+        }
         echo json_encode($this->mailbox_model->search_contacts($keyword));
         die();
     }
@@ -532,9 +543,25 @@ class Mailbox extends AdminController
 	{
         if ($this->input->is_ajax_request())
         {
-            $this->mailbox_model->change_tag_status($id, $status);
+            return $this->mailbox_model->change_tag_status($id, $status);
         }
 	}
+
+    public function update_mail_tag($id, $tag_id = '', $type = 'outbox')
+    {
+        $message = _l('cant_find', _l('mailbox_tag'));
+
+        if ($id) {
+            $success = true;
+            $response = $this->mailbox_model->update_mail_tag($id, $tag_id, $type);
+            if ($response) {
+				$message = _l('updated_successfully', _l('mailbox_tag'));
+            }
+        }
+
+        echo json_encode(['success' => $success, 'message' => $message, 'id' => $id, 'tag_id' => $tag_id, 'type' => $type ]);
+        die;
+    }
 
 	public function delete_tag($id)
 	{
@@ -660,7 +687,8 @@ class Mailbox extends AdminController
         }
 		$data['title'] = $title;
 		$data['email_templates'] = $this->emails_model->get([
-            'language' => 'english'
+            'language' => 'english',
+            'active' => true,
         ]);
 		$this->load->view('mailbox/email_templates/modal', $data);
     }
@@ -690,21 +718,172 @@ class Mailbox extends AdminController
 			set_alert('warning', _l('problem_deleting'));
 		}
 		redirect(admin_url('mailbox/email_templates'));
-	}
+	}    
 
-    public function update_mail_tag($id, $tag_id = '', $type = 'outbox')
-    {
-        $message = _l('cant_find', _l('mailbox_tag'));
-
-        if ($id) {
-            $success = true;
-            $response = $this->mailbox_model->update_mail_tag($id, $tag_id, $type);
-            if ($response) {
-				$message = _l('updated_successfully', _l('mailbox_tag'));
-            }
+    public function auto_replies() {
+        if ($this->input->is_ajax_request()) {
+            $this->app->get_table_data(module_views_path('mailbox', 'auto_replies/table'));
         }
 
-        echo json_encode(['success' => $success, 'message' => $message, 'id' => $id, 'tag_id' => $tag_id, 'type' => $type ]);
-        die;
+        $data['title'] = _l('mailbox_auto_replies');
+        $this->load->view('auto_replies/index', $data);
+    }
+
+    public function form_auto_reply($auto_reply_id = '') {
+		$auto_reply_id = $data['auto_reply_id'] = $auto_reply_id ? $auto_reply_id : '';
+
+		if ($this->input->post())
+		{
+			$data = $this->input->post();
+            if (isset($data['active'])) {
+                $data['active'] = 1;
+            } else {
+                $data['active'] = 0;
+            }
+			if ($auto_reply_id == '')
+			{
+				$id = $this->mailbox_model->add_auto_reply($data, $auto_reply_id);
+				$message = '';
+				$success = false;
+				if ($id)
+				{
+					$success = true;
+					$message = _l('added_successfully', _l('mailbox_auto_reply'));
+				}
+				echo json_encode(['success' => $success, 'message' => $message ]);
+				die;
+			}
+			$original_auto_reply = $this->mailbox_model->get_auto_reply($auto_reply_id);
+			$success = $this->mailbox_model->update_auto_reply($data, $auto_reply_id);
+            $message = _l('updated_successfully', _l('mailbox_auto_reply'));
+			echo json_encode(['success' => $success, 'message' => $message ]);
+			die;
+		}
+		if ($auto_reply_id == '')
+		{
+			$title = _l('add_new', _l('mailbox_auto_reply'));
+		} else {
+			$data['auto_reply'] = $this->mailbox_model->get_auto_reply($auto_reply_id);
+			if (!$data['auto_reply'])
+			{
+				header($_SERVER['SERVER_PROTOCOL'] . ' 400 Bad error');
+				echo json_encode(['success' => false, 'message' => 'Auto Reply Not Found', ]);
+				die;
+			}
+			$title = $data['auto_reply']->name;
+		}
+
+		$data['email_templates'] = $this->emails_model->get([
+            'language' => 'english',
+            'active' => true,
+        ]);
+        
+		$data['title'] = $title;
+		$this->load->view('mailbox/auto_replies/modal', $data);
+    }
+
+	public function change_auto_reply_status($id, $status)
+	{
+        if ($this->input->is_ajax_request())
+        {
+            return $this->mailbox_model->change_auto_reply_status($id, $status);
+        }
+	}
+
+	public function delete_auto_reply($id)
+	{
+		if (!$id)
+		{
+			redirect(admin_url('mailbox/auto_replies'));
+		}
+		$response = $this->mailbox_model->delete_auto_reply($id);
+		if (is_array($response) && isset($response['referenced']))
+		{
+			set_alert('warning', _l('mailbox_auto_reply_delete_transactions_warning', _l('mailbox_auto_replies')));
+		} else if ($response == true)
+		{
+			set_alert('success', _l('deleted', _l('mailbox_auto_reply')));
+		} else {
+			set_alert('warning', _l('problem_deleting'));
+		}
+		redirect(admin_url('mailbox/auto_replies'));
+	}
+
+    /**
+     * Assign customer from email
+     */
+    public function assign_email_to_customer()
+    {
+        // Retrieve the email subject and body from GET parameters
+        $email_subject = $this->input->get('email_subject'); // Get the email subject from the URL query string
+        $email_body = $this->input->get('email_body'); // Get the email body from the URL query string
+
+        // Check if both subject and body are present
+        if (empty($email_subject) || empty($email_body)) {
+            set_alert('danger', 'Email subject or body is missing');
+            redirect(admin_url('mailbox'));
+        }
+
+        // Get the current staff ID (the person performing the action)
+        $staff_id = get_staff_user_id(); // This retrieves the logged-in staff user ID
+
+        // Prepare task data using email subject as name and email body as description
+        $task_data = [
+            'name' => $email_subject, // Set task name as the email subject
+            'startdate' => date('Y-m-d'), // Set start date as today's date
+            'description' => $email_body, // Set task description as the email body
+        ];
+
+        // Insert the task into the database and get the task ID
+        $task_id = $this->tasks_model->add($task_data);
+
+        // Insert the task into the task_assigned table (assign it to the current staff)
+        $this->db->insert(db_prefix() . 'task_assigned', [
+            'taskid'        => $task_id,
+            'staffid'       => $staff_id, // Assign to the current staff member performing the action
+            'assigned_from' => $staff_id, // This also uses the current staff member as the one assigning
+        ]);
+
+        // Optionally, return a success message and redirect
+        set_alert('success', 'Email has been converted successfully to Task');
+        redirect(admin_url('tasks')); // Redirect to the task list page
+    }
+
+    /**
+     * Assign customers
+     *
+     * @return redirect
+     */
+    public function assign_customers()
+    {
+        if ($this->input->post()) {
+            $data = $this->input->post();
+            $this->load->model('mailbox_model');
+            $customerData = $this->mailbox_model->assign_customers($data);
+            if ($customerData) {
+                set_alert('success', _l('customers_assign_successfully'));
+                redirect(admin_url('mailbox/outbox/'.$data['outbox_id']));
+            }
+        }
+    }
+
+    public function assign_customers_inbox()
+    {
+        if ($this->input->post()) {
+            $data = $this->input->post();
+            $this->load->model('mailbox_model');
+            $customerData = $this->mailbox_model->assign_customers_inbox($data);
+            if ($customerData) {
+                set_alert('success', _l('customers_assign_successfully'));
+                redirect(admin_url('mailbox/inbox/'.$data['inbox_id']));
+            }
+        }
+    }
+
+    public function table_client_emails($client_id = '')
+    {
+        if ($this->input->is_ajax_request()) {
+            $this->app->get_table_data(module_views_path('mailbox', 'table_client_emails'), ['client_id' => $client_id]);
+        }        
     }
 }

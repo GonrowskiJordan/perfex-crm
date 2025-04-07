@@ -5,8 +5,7 @@
 <?= form_open(admin_url('mailbox/form_contact/' . ($contactid ? '/' . $contactid : '')), ['id' => 'contact-form', 'autocomplete' => 'off']); ?>
 
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-    </button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 
     <div class="tw-flex">
         <div class="tw-mr-4 tw-flex-shrink-0 tw-relative">

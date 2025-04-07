@@ -4,17 +4,23 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $aColumns = [
     db_prefix() . 'mail_outbox.to',
-    'sender_name',
-    'subject',
-    'date_sent',
+    db_prefix() . 'mail_outbox.sender_name',
+    db_prefix() . 'mail_outbox.subject',
+    db_prefix() . 'mail_outbox.date_sent',
+    db_prefix() . 'mail_outbox.scheduled_at',
     db_prefix() . 'mail_tags.id as tag_id',
     db_prefix() . 'mail_tags.name as tag_name',
+    db_prefix() . 'emailtemplates.emailtemplateid as template_id',
+    db_prefix() . 'emailtemplates.name as template_name',
 ];
 
 $sIndexColumn = 'id';
 $sTable       = db_prefix() . 'mail_outbox';
 
-$join = ['LEFT JOIN ' . db_prefix() . 'mail_tags ON ' . db_prefix() . 'mail_tags.id = ' . db_prefix() . 'mail_outbox.tagid'];
+$join = [
+    'LEFT JOIN ' . db_prefix() . 'mail_tags ON ' . db_prefix() . 'mail_tags.id = ' . db_prefix() . 'mail_outbox.tagid',
+    'LEFT JOIN ' . db_prefix() . 'emailtemplates ON ' . db_prefix() . 'emailtemplates.emailtemplateid = ' . db_prefix() . 'mail_outbox.templateid'
+];
 $where = [];
 array_push($where, 'AND trash = 0');
 if ($group == 'draft') {
@@ -23,7 +29,16 @@ if ($group == 'draft') {
     array_push($where, ' AND draft = 0');
 }
 array_push($where, ' AND sender_staff_id = '.get_staff_user_id());
-$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [db_prefix() . 'mail_outbox.id',db_prefix() . 'mail_outbox.has_attachment',db_prefix() . 'mail_outbox.stared',db_prefix() . 'mail_outbox.important',db_prefix() . 'mail_outbox.body']);
+$result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
+    db_prefix() . 'mail_outbox.id',
+    db_prefix() . 'mail_outbox.has_attachment',
+    db_prefix() . 'mail_outbox.stared',
+    db_prefix() . 'mail_outbox.important',
+    db_prefix() . 'mail_outbox.body',
+    db_prefix() . 'mail_outbox.subject',
+    db_prefix() . 'mail_outbox.date_sent',
+    db_prefix() . 'mail_outbox.scheduled_at'
+]);
 
 $mail_tags = get_mail_tags();
 
@@ -62,7 +77,7 @@ foreach ($rResult as $aRow) {
         $content = '<a href="'.admin_url().'mailbox/compose/'.$aRow['id'].'">';
     }
     $row[] = $content.'<span>'.$aRow[db_prefix() . 'mail_outbox.to'].'</span></a>';
-    $row[] = $content.'<span>'.$aRow['subject'].' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment.'</a>';    
+    $row[] = $content.'<span>'.$aRow['subject'].($has_attachment?' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment:'').'</a>';    
     $mail_tag_content = '<select class="mail-tag" data-id="'.$aRow['id'].'" data-type="outbox">';
     $mail_tag_content .= '<option></option>';
     foreach ($mail_tags as $mail_tag) {
@@ -70,6 +85,8 @@ foreach ($rResult as $aRow) {
     }
     $mail_tag_content .= '</select>';
     $row[] = $mail_tag_content;
+    $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
+    $row[] = $content.'<span>'._dt($aRow['scheduled_at']).'</span></a>';
     $row[] = $content.'<span>'._dt($aRow['date_sent']).'</span></a>';
 
     $output['aaData'][] = $row;
