@@ -116,6 +116,7 @@
                             </div>
                         </div>
                         <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" >
+                        <input type="hidden" name="type" value="outbox" />
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>

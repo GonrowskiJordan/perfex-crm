@@ -85,6 +85,7 @@ $lang['assign_customers']											    = 'Assegnare i clienti';
 $lang['assign_to_customers']											= 'Assegnare ai clienti';
 $lang['select_customers']												= 'Selezionare i clienti';
 $lang['customers_assign_successfully']									= 'Clienti assegnati con successo';
+$lang['customers_unassign_successfully']								= 'Clienti non assegnati con successo';
 $lang['customer_emails']									            = 'Email dei clienti';
 $lang['mailbox_from_to']									            = 'Da - A';
 $lang['mailbox_group']									                = 'Gruppo';

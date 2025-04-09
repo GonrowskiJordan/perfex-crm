@@ -356,10 +356,26 @@ function view_mailbox_auto_reply(auto_reply_id) {
     });
 }
 
+function unassgin_customer(client_id, mail_id, type='inbox') {
+    var data = {};
+    data.client_id = client_id;
+    data.mail_id = mail_id;
+    data.type = type;
+    $.post(admin_url + 'mailbox/unassign_customers', data).done(function(response) {
+        response = JSON.parse(response);
+        if (response.success === true || response.success == 'true') {
+            alert_float('success', response.message);
+            window.location.reload();
+        } else {
+            alert_float('warning', response.message);
+        }
+    });
+}
+
 $(document).ready(function() {
     enable_email_autocomplete();
 
     if ($('.table-mailbox-clients').length) {
-        initDataTable('.table-mailbox-clients', admin_url + 'mailbox/table_client_emails/' + mailbox_client_id, undefined, 'undefined', [0, 'asc']);
+       initDataTable('.table-mailbox-clients', admin_url + 'mailbox/table_client_emails/' + mailbox_client_id, undefined, [0], 'undefined', [2, 'asc']);
     }
 });

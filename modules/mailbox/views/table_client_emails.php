@@ -60,7 +60,8 @@ foreach ($rResult as $aRow) {
     if ($aRow['has_attachment'] > 0) {
         $has_attachment = '<i class="fa fa-paperclip pull-right" data-toggle="tooltip" title="'._l('mailbox_file_attachment').'" data-original-title="fa-paperclip"></i>';
     }
-    $type = "outbox";
+
+    $row[] = '<a class="btn btnIcon" data-toggle="tooltip" title="" data-original-title="'. _l('mailbox_delete').'" onclick="unassgin_customer('.$client_id.','.$aRow['id'].',\'outbox\');"><i class="fa fa-trash grey"></i></a>';
 
     $row[] = $content.'<span class="'.$read.'">'._l('mailbox_outbox').'</span></a>';
     $content = '<a href="'.admin_url().'mailbox/outbox/'.$aRow['id'].'">';
@@ -137,6 +138,8 @@ foreach ($rResult as $aRow) {
     if ($aRow['has_attachment'] > 0) {
         $has_attachment = '<i class="fa fa-paperclip pull-right" data-toggle="tooltip" title="'._l('mailbox_file_attachment').'" data-original-title="fa-paperclip"></i>';
     }
+
+    $row[] = '<a class="btn btnIcon" data-toggle="tooltip" title="" data-original-title="'. _l('mailbox_delete').'" onclick="unassgin_customer('.$client_id.','.$aRow['id'].',\'inbox\');"><i class="fa fa-trash grey"></i></a>';
 
     $content = '<a href="'.admin_url().'mailbox/inbox/'.$aRow['id'].'">';
     $row[] = $content.'<span class="'.$read.'">'._l('mailbox_inbox').'</span></a>';

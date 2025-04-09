@@ -881,28 +881,28 @@ class Mailbox extends AdminController
             $customerData = $this->mailbox_model->assign_customers($data);
             if ($customerData) {
                 set_alert('success', _l('customers_assign_successfully'));
-                redirect(admin_url('mailbox/outbox/'.$data['mailbox_id']));
+                redirect(admin_url('mailbox/'.$data['type'].'/'.$data['mailbox_id']));
             }
         }
     }
 
-    public function assign_customers_inbox()
+    public function unassign_customers()
     {
         if ($this->input->post()) {
             $data = $this->input->post();
             $this->load->model('mailbox_model');
-            $customerData = $this->mailbox_model->assign_customers_inbox($data);
-            if ($customerData) {
-                set_alert('success', _l('customers_assign_successfully'));
-                redirect(admin_url('mailbox/inbox/'.$data['mailbox_id']));
-            }
-        }
+            set_alert('success', _l('customers_unassign_successfully'));
+            $success = $this->mailbox_model->unassign_customers($data);
+        }        
+
+        echo json_encode(['success' => $success, 'message' => _l('customers_unassign_successfully'), 'id' => $data['mail_id'], 'client_id' => $data['client_id'], 'type' => $data['type'] ]);
+        die;
     }
 
     public function table_client_emails($client_id = '')
     {
         if ($this->input->is_ajax_request()) {
             $this->app->get_table_data(module_views_path('mailbox', 'table_client_emails'), ['client_id' => $client_id]);
-        }        
+        }
     }
 }

@@ -18,6 +18,7 @@
 
 <?php
     $table_data = [
+        '<span> - </span>',
         [
             'name'    => _l('mailbox_group'),
             'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-group'],
@@ -52,7 +53,7 @@
         ]);
     }
 
-    echo render_datatable($table_data, 'mailbox-clients'); ?>
+    render_datatable($table_data, 'mailbox-clients', []); ?>
 <?php } ?>
 
 <script>

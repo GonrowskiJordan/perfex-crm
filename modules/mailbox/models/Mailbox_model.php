@@ -817,10 +817,10 @@ class Mailbox_model extends App_Model
     public function assign_customers($data) {
         foreach($data['select_customers'] as $value) {
             $customer_mail = [];
-            $customer_mail['outbox_id'] = $data['mailbox_id'];
+            $customer_mail[$data['type'] . '_id'] = $data['mailbox_id'];
             $customer_mail['client_id'] = $value;
             $this->db->select('*');
-            $this->db->where("outbox_id", $data['mailbox_id']);
+            $this->db->where($data['type'] . "_id", $data['mailbox_id']);
             $this->db->where("client_id", $value);
             $select_data = $this->db->get(db_prefix().'mail_clients')->result_array();
             if (empty($select_data)) {
@@ -831,20 +831,10 @@ class Mailbox_model extends App_Model
         return true;
     }
 
-    public function assign_customers_inbox($data) {
-        foreach($data['select_customers'] as $value) {
-            $customer_mail = [];
-            $customer_mail['inbox_id'] = $data['mailbox_id'];
-            $customer_mail['client_id'] = $value;
-            $this->db->select('*');
-            $this->db->where("inbox_id", $data['mailbox_id']);
-            $this->db->where("client_id", $value);
-            $select_data = $this->db->get(db_prefix().'mail_clients')->result_array();
-            if (empty($select_data)) {
-               $this->db->insert(db_prefix().'mail_clients', $customer_mail);
-               $mail_customer_id = $this->db->insert_id();
-            } 
-        }
+    public function unassign_customers($data) {
+        $this->db->where($data['type'] . '_id', $data['mail_id']);
+        $this->db->where('client_id', $data['client_id']);
+        $this->db->delete(db_prefix().'mail_clients');
         return true;
     }
 }

@@ -85,6 +85,7 @@ $lang['assign_customers']											    = 'Призначити клієнтів
 $lang['assign_to_customers']											= 'AПризначити клієнтам';
 $lang['select_customers']												= 'Вибрати клієнтів';
 $lang['customers_assign_successfully']									= 'Успішно призначені клієнти';
+$lang['customers_unassign_successfully']								= 'Успішно скасовані клієнти';
 $lang['customer_emails']									            = 'Електронні адреси клієнтів';
 $lang['mailbox_from_to']									            = 'Від - До';
 $lang['mailbox_group']									                = 'Група';

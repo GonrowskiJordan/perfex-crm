@@ -101,7 +101,7 @@
 </script>
 
 <div class="modal fade" id="customers_item_modal" tabindex="-1" role="dialog" aria-labelledby="customersItemModalLabel">
-    <?php echo form_open_multipart(admin_url().'mailbox/assign_customers_inbox', ['id'=>'customer_assign_form']); ?>
+    <?php echo form_open_multipart(admin_url().'mailbox/assign_customers', ['id'=>'customer_assign_form']); ?>
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -132,7 +132,8 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" >
+                        <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" />
+                        <input type="hidden" name="type" value="inbox" />
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>
