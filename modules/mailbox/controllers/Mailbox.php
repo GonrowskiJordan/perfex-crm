@@ -69,9 +69,12 @@ class Mailbox extends AdminController
         ]);
 
         if (isset($outbox_id)) {
-            $mail         = $this->mailbox_model->get($outbox_id, 'outbox');
-            $data['mail'] = $mail;
-            $data['outbox_id'] = $outbox_id;
+            $mail                   = $this->mailbox_model->get($outbox_id, 'outbox');
+            $data['mail']           = $mail;
+            $data['outbox_id']      = $outbox_id;
+            $data['clients']        = $this->mailbox_model->select_client();
+            $data['leads']          = $this->mailbox_model->select_lead();
+            $data['tickets']        =  $this->mailbox_model->select_ticket();
         }
         $this->load->view('mailbox', $data);
     }
@@ -112,7 +115,7 @@ class Mailbox extends AdminController
         $data['title']          = $inbox->subject;
         $group                  = 'detail';
         $data['group']          = $group;
-        $data['inbox']          = $inbox;
+        $data['mailbox']        = $inbox;
         $data['type']           = 'inbox';
         $data['attachments']    = $this->mailbox_model->get_mail_attachment($id, 'inbox');
         $data['clients']        = $this->mailbox_model->select_client();
@@ -132,17 +135,17 @@ class Mailbox extends AdminController
      */
     public function outbox($id)
     {
-        $inbox               = $this->mailbox_model->get($id, 'outbox');
-        $data['title']       = $inbox->subject;
-        $group               = 'detail';
-        $data['group']       = $group;
-        $data['inbox']       = $inbox;
-        $data['type']        = 'outbox';
-        $data['attachments'] = $this->mailbox_model->get_mail_attachment($id, 'outbox');
-        $data['leads'] =  $this->mailbox_model->select_lead();
-        $data['tickets'] =  $this->mailbox_model->select_ticket();
-        $data['outbox_id'] = $id;
-        $data['bodyclass'] = 'dynamic-create-groups';
+        $outbox                 = $this->mailbox_model->get($id, 'outbox');
+        $data['title']          = $outbox->subject;
+        $group                  = 'detail';
+        $data['group']          = $group;
+        $data['mailbox']        = $outbox;
+        $data['type']           = 'outbox';
+        $data['attachments']    = $this->mailbox_model->get_mail_attachment($id, 'outbox');
+        $data['leads']          = $this->mailbox_model->select_lead();
+        $data['tickets']        = $this->mailbox_model->select_ticket();
+        $data['outbox_id']      = $id;
+        $data['bodyclass']      = 'dynamic-create-groups';
         $this->load->view('mailbox', $data);
     }
 
@@ -701,6 +704,22 @@ class Mailbox extends AdminController
         }
 	}
 
+    public function update_mail_template($id, $template_id = '', $type = 'outbox')
+    {
+        $message = _l('cant_find', _l('email_template'));
+
+        if ($id) {
+            $success = true;
+            $response = $this->mailbox_model->update_mail_template($id, $template_id, $type);
+            if ($response) {
+				$message = _l('updated_successfully', _l('email_template'));
+            }
+        }
+
+        echo json_encode(['success' => $success, 'message' => $message, 'id' => $id, 'template_id' => $template_id, 'type' => $type ]);
+        die;
+    }
+
 	public function delete_email_template($id)
 	{
 		if (!$id)
@@ -862,7 +881,7 @@ class Mailbox extends AdminController
             $customerData = $this->mailbox_model->assign_customers($data);
             if ($customerData) {
                 set_alert('success', _l('customers_assign_successfully'));
-                redirect(admin_url('mailbox/outbox/'.$data['outbox_id']));
+                redirect(admin_url('mailbox/outbox/'.$data['mailbox_id']));
             }
         }
     }
@@ -875,7 +894,7 @@ class Mailbox extends AdminController
             $customerData = $this->mailbox_model->assign_customers_inbox($data);
             if ($customerData) {
                 set_alert('success', _l('customers_assign_successfully'));
-                redirect(admin_url('mailbox/inbox/'.$data['inbox_id']));
+                redirect(admin_url('mailbox/inbox/'.$data['mailbox_id']));
             }
         }
     }

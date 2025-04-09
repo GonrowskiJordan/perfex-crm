@@ -33,7 +33,7 @@
 <div class="row">
 	<div class="col-md-12 center-block">
 	    <br>
-		<button type="submit" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-info">          
+		<button type="submit" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-info">    
             <?php echo _l('save'); ?>
         </button>
 	</div>

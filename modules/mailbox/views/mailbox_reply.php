@@ -101,7 +101,7 @@
         </div>
 
         <div class="btn-group mbpull-left">
-            <a href="<?php echo admin_url().'mailbox'; ?>" class="btn btn-warning close-send-template-modal"><?php echo _l('cancel'); ?></a>      
+            <a href="<?php echo admin_url().'mailbox'; ?>" class="btn btn-warning close-send-template-modal"><?php echo _l('cancel'); ?></a>
         </div>
 
         <div class="pull-right">

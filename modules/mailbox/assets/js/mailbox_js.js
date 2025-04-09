@@ -359,5 +359,7 @@ function view_mailbox_auto_reply(auto_reply_id) {
 $(document).ready(function() {
     enable_email_autocomplete();
 
-    initDataTable('.table-mailbox-clients', admin_url + 'mailbox/table_client_emails/' + mailbox_client_id, undefined, 'undefined', [0, 'asc']);
+    if ($('.table-mailbox-clients').length) {
+        initDataTable('.table-mailbox-clients', admin_url + 'mailbox/table_client_emails/' + mailbox_client_id, undefined, 'undefined', [0, 'asc']);
+    }
 });

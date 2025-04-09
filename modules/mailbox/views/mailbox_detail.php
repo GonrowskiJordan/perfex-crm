@@ -5,45 +5,63 @@
 <div class="">
     <div class="email-media">
         <div class="media mt-0">
-            <?php echo staff_profile_image($inbox->from_staff_id, ['mr-2 rounded-circle']); ?>
+            <?php echo staff_profile_image($mailbox->from_staff_id, ['mr-2 rounded-circle']); ?>
             
             <div class="media-body">
                 <div class="float-right d-md-flex fs-15">
-                    <small class="mr-2"><?php echo _dt($inbox->date_received); ?></small>
+                    <small class="mr-2"><?php echo _dt($mailbox->date_received); ?></small>
                     <?php
                         $starred       = 'fa-star text-dark';
                         $msg_starred   = _l('mailbox_add_star');
                         $important     = 'fa-bookmark text-dark';
                         $msg_important = _l('mailbox_mark_as_important');
-                        if (1 == $inbox->stared) {
+                        if (1 == $mailbox->stared) {
                             $starred = 'fa-star orange';
                             $msg_starred = _l('mailbox_remove_star');
                         }
-                        if (1 == $inbox->important) {
+                        if (1 == $mailbox->important) {
                             $important     = 'fa fa-bookmark green';
                             $msg_important = _l('mailbox_mark_as_not_important');
                         }
                     ?>
-                    <small class="mr-2 cursor" onclick="update_field('detail','starred',<?php echo $inbox->stared; ?>,<?php echo $inbox->id; ?>);"><i class="fa <?php echo $starred; ?>" data-toggle="tooltip" title="" data-original-title="<?php echo $msg_starred; ?>"></i></small>
-                    <small class="mr-2 cursor" onclick="update_field('detail','important',<?php echo $inbox->important; ?>,<?php echo $inbox->id; ?>);"><i class="fa <?php echo $important; ?>" data-toggle="tooltip" title="" data-original-title="<?php echo $msg_important; ?>"></i></small>
-                    <small class="mr-2 cursor"><a href="<?php echo admin_url().'mailbox/reply/'.$inbox->id.'/reply'; ?>"><i class="fa fa-reply text-dark" data-toggle="tooltip" title="" data-original-title="<?php echo _l('mailbox_reply'); ?>"></i></a></small>
+                    <small class="mr-2 cursor" onclick="update_field('detail','starred',<?php echo $mailbox->stared; ?>,<?php echo $mailbox->id; ?>);"><i class="fa <?php echo $starred; ?>" data-toggle="tooltip" title="" data-original-title="<?php echo $msg_starred; ?>"></i></small>
+                    <small class="mr-2 cursor" onclick="update_field('detail','important',<?php echo $mailbox->important; ?>,<?php echo $mailbox->id; ?>);"><i class="fa <?php echo $important; ?>" data-toggle="tooltip" title="" data-original-title="<?php echo $msg_important; ?>"></i></small>
+                    <small class="mr-2 cursor"><a href="<?php echo admin_url().'mailbox/reply/'.$mailbox->id.'/reply'; ?>"><i class="fa fa-reply text-dark" data-toggle="tooltip" title="" data-original-title="<?php echo _l('mailbox_reply'); ?>"></i></a></small>
                 </div>
-                <div class="media-title text-dark font-weight-semiblod"><?php echo $inbox->sender_name; ?> <span class="text-muted">( <?php echo $inbox->from_email; ?> )</span></div>
-                <p class="mb-0 font-weight-semiblod">To: <?php echo $inbox->to; ?></p>
-                <p class="mb-0 font-weight-semiblod">Cc: <?php echo $inbox->cc; ?></p>
+                <div class="media-title text-dark font-weight-semiblod"><?php echo $mailbox->sender_name; ?> <span class="text-muted">( <?php echo $mailbox->from_email; ?> )</span></div>
+                <p class="mb-0 font-weight-semiblod">To: <?php echo $mailbox->to; ?></p>
+                <p class="mb-0 font-weight-semiblod">Cc: <?php echo $mailbox->cc; ?></p>
+                <div class="mb-0 font-weight-semiblod tw-flex mtop5 select-wrapper">
+                    <span><?php echo _l('mailbox_tag') ?>: </span>
+                    <select class="mail-tag" data-id="<?php echo $mailbox->id; ?>" data-type="inbox">
+                        <option></option>
+                        <?php foreach (get_mail_tags() as $mailbox_tag) { ?>
+                            <option data-id="<?php echo $mailbox_tag['id'] ?>" <?php echo ($mailbox_tag['id'] == $mailbox->tagid ? 'selected' : '') ?>><?php echo $mailbox_tag['name'] ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <div class="mb-0 font-weight-semiblod tw-flex mtop5 select-wrapper">
+                    <span><?php echo _l('email_template') ?>: </span>
+                    <select class="mail-template" data-id="<?php echo $mailbox->id; ?>" data-type="inbox">
+                        <option></option>
+                        <?php foreach (get_mail_templates() as $mailbox_template) { ?>
+                            <option data-id="<?php echo $mailbox_template['emailtemplateid'] ?>" <?php echo ($mailbox_template['emailtemplateid'] == $mailbox->templateid ? 'selected' : '') ?>><?php echo $mailbox_template['name'] ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
     <div class="email-body">
-        <p><?php echo $inbox->body; ?></p>
+        <p><?php echo $mailbox->body; ?></p>
         <hr>
-        <?php if ($inbox->has_attachment > 0) { ?>
+        <?php if ($mailbox->has_attachment > 0) { ?>
             <div class="email-attch">
                 <p><?php echo _l('mailbox_file_attachment'); ?></p>
                 <div class="emai-img">
                     <div class="">
                         <?php foreach ($attachments as $attachment) {
-                            $attachment_url = module_dir_url(MAILBOX_MODULE).'uploads/'.$type.'/'.$inbox->id.'/'.$attachment['file_name'];  ?>
+                            $attachment_url = module_dir_url(MAILBOX_MODULE).'uploads/'.$type.'/'.$mailbox->id.'/'.$attachment['file_name'];  ?>
                             <div class="mbot15 row" data-attachment-id="<?php echo $attachment['id']; ?>">
                                 <div class="col-md-8">
                                     <div class="mbpull-left"><i class="<?php echo get_mime_class($attachment['file_type']); ?>"></i></div>
@@ -63,21 +81,22 @@
     </div>
 
     <div class="pull-right">
-        <a class="btn btn-info" type="button" data-toggle="modal" data-target="#customers_item_modal"><i class="fa fa-user"></i> <?php echo _l('assign_customers'); ?></a>
-        <a class="btn btn-danger" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data?email_subject=' . urlencode($inbox->subject) . '&email_body=' . urlencode($inbox->body)); ?>"><i class="fa fa-tasks"></i> <?php echo _l('assign_task'); ?></a>
-        <button class="btn btn-success" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>      
-        <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#ticket_item_modal"><i class="fa fa-life-ring"></i> <?php echo _l('assign_to_tickets'); ?></button>	  
-        <a href="<?php echo admin_url().'mailbox/reply/'.$inbox->id.'/reply'; ?>" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-warning">
+        <a class="btn btn-info mbot10" type="button" data-toggle="modal" data-target="#customers_item_modal"><i class="fa fa-user"></i> <?php echo _l('assign_customers'); ?></a>
+        <a class="btn btn-danger mbot10" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data?email_subject=' . urlencode($mailbox->subject) . '&email_body=' . urlencode($mailbox->body)); ?>"><i class="fa fa-tasks"></i> <?php echo _l('assign_task'); ?></a>
+        <button class="btn btn-success mbot10" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>
+        <button class="btn btn-danger mbot10" type="button" data-toggle="modal" data-target="#ticket_item_modal"><i class="fa fa-life-ring"></i> <?php echo _l('assign_to_tickets'); ?></button>
+        <a href="<?php echo admin_url().'mailbox/reply/'.$mailbox->id.'/reply'; ?>" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-warning mbot10">
             <i class="fa fa-reply"></i></i> <?php echo _l('mailbox_reply'); ?>
         </a>
-        <a href="<?php echo admin_url().'mailbox/reply/'.$inbox->id.'/forward'; ?>" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-info">
+        <a href="<?php echo admin_url().'mailbox/reply/'.$mailbox->id.'/forward'; ?>" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-info mbot10">
             <i class="fa fa-share"></i>
             <?php echo _l('mailbox_forward'); ?>
         </a>
     </div>
 </div>
+
 <script>
-    var mailid = <?php echo $inbox->id; ?>;
+    var mailid = <?php echo $mailbox->id; ?>;
     var mailtype = '<?php echo $type; ?>';
 </script>
 
@@ -113,7 +132,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="inbox_id" value="<?php echo $inbox_id ?>" >
+                        <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" >
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>
@@ -154,12 +173,12 @@
                                             } else {
                                                 echo render_select('select_lead[]', $leads, ['id', 'name'], 'select_lead', $selected, ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
                                             }
-                                        ?>        
+                                        ?>  
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="inbox_id" value="<?php echo $inbox_id ?>" >
+                        <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" >
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>
@@ -260,7 +279,7 @@
 <div class="modal fade" id="ticket_item_modal" tabindex="-1" role="dialog" aria-labelledby="ticketItemModalLabel">
     <?php echo form_open_multipart(admin_url().'mailbox/conversationTicket_inbox', ['id'=>'ticket_assign_form']); ?>
     <input type="hidden" id="emailBodyInput" name="email_message">
-    <input type="hidden" name="subject" value="<?php echo $inbox->subject; ?>">
+    <input type="hidden" name="subject" value="<?php echo $mailbox->subject; ?>">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -296,7 +315,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="inbox_id" value="<?php echo $inbox_id ?>" >
+                        <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" >
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>
@@ -313,7 +332,7 @@
 <div class="modal fade" id="task_item_modal" tabindex="-1" role="dialog" aria-labelledby="taskItemModalLabel">
     <?php echo form_open_multipart(admin_url().'mailbox/conversationTask_inbox', ['id'=>'task_assign_form']); ?>
     <input type="hidden" id="emailBodyInput" name="email_message">
-    <input type="hidden" name="subject" value="<?php echo $inbox->subject; ?>">
+    <input type="hidden" name="subject" value="<?php echo $mailbox->subject; ?>">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -349,7 +368,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="inbox_id" value="<?php echo $inbox_id ?>" >
+                        <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" >
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>

@@ -537,6 +537,8 @@ class Mailbox_model extends App_Model
         }
         $this->db->where('id', $id);
         $email = $this->db->get(db_prefix() . 'mail_' . $type)->row();
+        
+        $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'mail_' . $type, ['tagid' => $tag_id, ]);
         $affectedRows = 0;
         if ($this->db->affected_rows() > 0) {
@@ -632,6 +634,36 @@ class Mailbox_model extends App_Model
                 hooks()->do_action('mailbox_email_template_status_changed', ['id' => $email_template['emailtemplateid'], 'status' => $status, ]);
                 log_activity('Email Template Status Changed [TagID: ' . $email_template['emailtemplateid'] . ' Status(Active/Inactive): ' . $status . ']');
             }
+        }
+
+        return $affectedRows ? true : false;
+    }
+
+    /**
+     * Update mailbox template
+     * @param  mixed $id        mail id
+     * @param  mixed $tag_id    template id
+     * @param  mixed $type      type
+     * @return object
+     */
+    public function update_mail_template($id, $template_id, $type = 'outbox')
+    {
+        if ($template_id) {
+            $this->db->where('emailtemplateid', $template_id);
+            $email_template = $this->db->get(db_prefix() . 'emailtemplates')->row();
+        } else {
+            $template_id = null;
+        }
+        $this->db->where('id', $id);
+        $email = $this->db->get(db_prefix() . 'mail_' . $type)->row();
+        
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix() . 'mail_' . $type, ['templateid' => $template_id, ]);
+        $affectedRows = 0;
+        if ($this->db->affected_rows() > 0) {
+            $affectedRows++;
+            hooks()->do_action('mailbox_template_changed', ['id' => $email->id, 'templateid' => $template_id, ]);
+            log_activity('Email Template Changed [ID: ' . $email->id . (isset($email_template) && $email_template ? ' Template: ' . $email_template->name : '' ) . ']');
         }
 
         return $affectedRows ? true : false;
@@ -785,10 +817,10 @@ class Mailbox_model extends App_Model
     public function assign_customers($data) {
         foreach($data['select_customers'] as $value) {
             $customer_mail = [];
-            $customer_mail['outbox_id'] = $data['outbox_id'];
+            $customer_mail['outbox_id'] = $data['mailbox_id'];
             $customer_mail['client_id'] = $value;
             $this->db->select('*');
-            $this->db->where("outbox_id", $data['outbox_id']);
+            $this->db->where("outbox_id", $data['mailbox_id']);
             $this->db->where("client_id", $value);
             $select_data = $this->db->get(db_prefix().'mail_clients')->result_array();
             if (empty($select_data)) {
@@ -802,10 +834,10 @@ class Mailbox_model extends App_Model
     public function assign_customers_inbox($data) {
         foreach($data['select_customers'] as $value) {
             $customer_mail = [];
-            $customer_mail['inbox_id'] = $data['inbox_id'];
+            $customer_mail['inbox_id'] = $data['mailbox_id'];
             $customer_mail['client_id'] = $value;
             $this->db->select('*');
-            $this->db->where("inbox_id", $data['inbox_id']);
+            $this->db->where("inbox_id", $data['mailbox_id']);
             $this->db->where("client_id", $value);
             $select_data = $this->db->get(db_prefix().'mail_clients')->result_array();
             if (empty($select_data)) {

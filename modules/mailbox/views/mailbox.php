@@ -127,17 +127,17 @@
                                             </li>
                                             <?php if ('detail' == $group) {?>
                                                 <li role="presentation" data-toggle="tooltip" title="" class="tab-separator" data-original-title="<?php echo _l('mailbox_reply'); ?>">
-                                                    <a href="<?php echo admin_url().'mailbox/reply/'.$inbox->id.'/reply/'.$type; ?>">
+                                                    <a href="<?php echo admin_url().'mailbox/reply/'.$mailbox->id.'/reply/'.$type; ?>">
                                                         <i class="fa fa-mail-reply" aria-hidden="true"></i>
                                                     </a>
                                                 </li>
                                                 <li role="presentation" data-toggle="tooltip" title="" class="tab-separator" data-original-title="<?php echo _l('mailbox_reply_all'); ?>">
-                                                    <a href="<?php echo admin_url().'mailbox/reply/'.$inbox->id.'/replyall/'.$type; ?>">
+                                                    <a href="<?php echo admin_url().'mailbox/reply/'.$mailbox->id.'/replyall/'.$type; ?>">
                                                         <i class="fa fa-mail-reply-all" aria-hidden="true"></i>
                                                     </a>
                                                 </li>
                                                 <li role="presentation" data-toggle="tooltip" title="" class="tab-separator" data-original-title="<?php echo _l('mailbox_forward'); ?>">
-                                                    <a href="<?php echo admin_url().'mailbox/reply/'.$inbox->id.'/forward/'.$type; ?>">
+                                                    <a href="<?php echo admin_url().'mailbox/reply/'.$mailbox->id.'/forward/'.$type; ?>">
                                                         <i class="fa fa-mail-forward" aria-hidden="true"></i>
                                                     </a>
                                                 </li>
@@ -207,7 +207,7 @@
                                             'data-default-order'         => get_table_last_order('mailbox'),
                                         ]);
                                      ?>
-                                <?php } ?>                                
+                                <?php } ?>                          
                             </div>
                         </div>
                     </div>
@@ -226,13 +226,14 @@
         init_btn_with_tooltips();
         init_tabs_scrollable();
         var webmailTableNotSortable = [0];
-        initDataTable('.table-mailbox', admin_url + 'mailbox/table/<?php echo $group; ?>', 'undefined', webmailTableNotSortable, 'undefined', [4, 'desc']);
+        initDataTable('.table-mailbox', admin_url + 'mailbox/table/<?php echo $group; ?>', 'undefined', webmailTableNotSortable, 'undefined', [5, 'desc']);
+
         appValidateForm($('#mailbox_config_form'), {
             email: 'required',
             mail_password: 'required',
         });
         
-        $("body").on("change", ".table-mailbox .mail-tag", function (event, state) {
+        $("body").on("change", ".mail-tag", function (event, state) {
             let mail_id = $(this).data('id');
             let mail_type = $(this).data('type');
             let tag_id = $(this).find('option:selected').data('id');
@@ -241,6 +242,25 @@
             }
             $.ajax({
                 url: admin_url + 'mailbox/update_mail_tag/' + mail_id + '/' + tag_id + '/' + mail_type
+            }).done(function(response) {
+                response = JSON.parse(response);
+                if (response.success) {
+                    alert_float('success', response.message);
+                }
+            }).fail(function(error) {
+                alert_float('danger', JSON.parse(error.responseText));
+            });
+        });
+        
+        $("body").on("change", ".mail-template", function (event, state) {
+            let mail_id = $(this).data('id');
+            let mail_type = $(this).data('type');
+            let template_id = $(this).find('option:selected').data('id');
+            if (typeof template_id === 'undefined') {
+                template_id = 0;
+            }
+            $.ajax({
+                url: admin_url + 'mailbox/update_mail_template/' + mail_id + '/' + template_id + '/' + mail_type
             }).done(function(response) {
                 response = JSON.parse(response);
                 if (response.success) {

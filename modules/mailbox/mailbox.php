@@ -73,8 +73,9 @@ function mailbox_module_init_menu_items()
         }
 
         $CI->app_menu->add_sidebar_menu_item('mailbox', [
-            'name'     => _l('mailbox') . $badge,
+            'name'     => _l('mailbox'),
             'icon'     => 'fa fa-envelope-square',
+            'href'     => admin_url('mailbox'),
             'position' => 6,
         ]);
         $CI->app_menu->add_sidebar_children_item('mailbox', [

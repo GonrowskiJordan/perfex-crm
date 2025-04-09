@@ -12,14 +12,14 @@
                 $cc             = '';
                 $subject        = '';
                 $body           = '';
-                $sendtime       = '';
+                $scheduled_at   = '';
             ?>
             <?php if (isset($mail)) {
                 $to             = $mail->to;
                 $cc             = $mail->cc;
                 $subject        = $mail->subject;
                 $body           = $mail->body;
-                $sendtime       = $mail->sendtime->format('Y-m-d H:i');
+                $scheduled_at   = $mail->scheduled_at ? $mail->scheduled_at->format('Y-m-d H:i') : '';
             }
             ?>
             <div class="email-autocomplete">
@@ -41,25 +41,25 @@
             </div>
             
             <?php
-            $CI = &get_instance();
-            $CI->db->select()->from(db_prefix().'mail_tags')->where(db_prefix().'mail_tags.active', 1);
-            $mailbox_tags = $CI->db->get()->result_array();
+                $CI = &get_instance();
+                $CI->db->select()->from(db_prefix().'mail_tags')->where(db_prefix().'mail_tags.active', 1);
+                $mailbox_tags = $CI->db->get()->result_array();
 
-            $CI = &get_instance();
-            $CI->db->select()->from(db_prefix().'emailtemplates')->where(db_prefix().'emailtemplates.active', 1)->where(db_prefix().'emailtemplates.language','english');
-            $email_templates = $CI->db->get()->result_array();
+                $CI = &get_instance();
+                $CI->db->select()->from(db_prefix().'emailtemplates')->where(db_prefix().'emailtemplates.active', 1)->where(db_prefix().'emailtemplates.language', 'english');
+                $email_templates = $CI->db->get()->result_array();
 
-            $CI->db->select()->from(db_prefix().'staff')->where(db_prefix().'staff.mail_password !=', '');
-            $staffs = $CI->db->get()->result_array();
-            
-            $myid = get_staff_user_id();
-            
-            $CI->db->select()->from(db_prefix().'staff')->where('staffid', $myid );
-            $currentusers = $CI->db->get()->result_array();
-            
-            foreach ($currentusers as $currentuser) {
-                $mail_signature = $currentuser['mail_signature'];
-            }
+                $CI->db->select()->from(db_prefix().'staff')->where(db_prefix().'staff.mail_password !=', '');
+                $staffs = $CI->db->get()->result_array();
+                
+                $myid = get_staff_user_id();
+                
+                $CI->db->select()->from(db_prefix().'staff')->where('staffid', $myid );
+                $currentusers = $CI->db->get()->result_array();
+                
+                foreach ($currentusers as $currentuser) {
+                    $mail_signature = $currentuser['mail_signature'];
+                }
             ?>
 
             <hr />
@@ -99,23 +99,24 @@
             </select>
         </div>
         
-        <?php echo render_datetime_input('scheduled_at', 'mailbox_scheduled_at', $sendtime); ?>
+        <?php echo render_datetime_input('scheduled_at', 'mailbox_scheduled_at', $scheduled_at); ?>
 
         <div class="btn-group mbpull-left">
-            <a href="<?php echo admin_url().'mailbox'; ?>" class="btn btn-warning close-send-template-modal"><?php echo _l('cancel'); ?></a>       
+            <a href="<?php echo admin_url().'mailbox'; ?>" class="btn btn-warning close-send-template-modal"><?php echo _l('cancel'); ?></a> 
         </div>
         <div class="pull-right">
             <?php if (!isset($mail)) { ?>
-                <button type="submit" name="sendmail" value="draft" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-primary">
+                <button type="submit" name="sendmail" value="draft" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-primary mbot10">
                     <i class="fa fa-file menu-icon"></i> <?php echo _l('mailbox_save_draft'); ?>
                 </button>
             <?php } ?>
             <?php if (isset($outbox_id)) { ?>
-                <a class="btn btn-success" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data'); ?>"><i class="fa fa-life-ring"></i> <?php echo _l('assign_task'); ?></a>
-                <button class="btn btn-success" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>      
-                <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#ticket_item_modal"><i class="fa fa-life-ring"></i> <?php echo _l('assign_to_tickets'); ?></button>	  
+                <a class="btn btn-info mbot10" type="button" data-toggle="modal" data-target="#customers_item_modal"><i class="fa fa-user"></i> <?php echo _l('assign_customers'); ?></a>
+                <a class="btn btn-success mbot10" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data'); ?>"><i class="fa fa-life-ring"></i> <?php echo _l('assign_task'); ?></a>
+                <button class="btn btn-succes mbot10s" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>
+                <button class="btn btn-danger mbot10" type="button" data-toggle="modal" data-target="#ticket_item_modal"><i class="fa fa-life-ring"></i> <?php echo _l('assign_to_tickets'); ?></button>
             <?php } ?>
-            <button type="submit" name="sendmail" value="outbox" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-info">
+            <button type="submit" name="sendmail" value="outbox" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-info mbot10">
                 <i class="fa fa-paper-plane menu-icon"></i>
                 <?php echo _l('mailbox_send'); ?>
             </button>
@@ -123,6 +124,53 @@
     </div>
 </div>
 <?php echo form_close(); ?>
+
+<div class="modal fade" id="customers_item_modal" tabindex="-1" role="dialog" aria-labelledby="customersItemModalLabel">
+    <?php echo form_open_multipart(admin_url().'mailbox/assign_customers', ['id'=>'customer_assign_form']); ?>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="customersItemModalLabel">
+                    <span class="edit-title"><?php echo _l('assign_customers'); ?></span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-warning affect-warning hide">
+                            <?php echo _l('changing_items_affect_warning'); ?>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div id="customers">
+                                        <?php
+                                            $selected = [];
+                                            if (is_admin()) {
+                                                echo render_select_with_input_group('select_customers[]', $clients, ['userid', 'company'], 'select_customers', $selected, '<div class="input-group-btn"><a href="#" class="btn btn-default" data-toggle="modal" data-target="#customer_group_modal"><i class="fa fa-plus"></i></a></div>', ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
+                                            } else {
+                                                echo render_select('select_customers[]', $clients, ['userid', 'company'], 'select_customers', $selected, ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
+                                            }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="mailbox_id" value="<?php echo $outbox_id ?>" >
+                        <div class="clearfix mbot15"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+                <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+            </div>
+        </div>
+    </div>
+    <?php echo form_close(); ?>
+</div>
+
 <div class="modal fade" id="sales_item_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <?php echo form_open_multipart(admin_url().'mailbox/conversationLead', ['id'=>'lead_assign_form']); ?>
     <div class="modal-dialog" role="document">
@@ -168,6 +216,7 @@
     </div>
     <?php echo form_close(); ?>
 </div>
+
 <div class="modal fade" id="ticket_item_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <?php echo form_open_multipart(admin_url().'mailbox/conversationTicket', ['id'=>'ticket_assign_form']); ?>
     <div class="modal-dialog" role="document">
@@ -200,7 +249,7 @@
                                                 $rel_val = get_relation_values($rel_data,'customer');
                                                 echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
                                             } ?>							
-							            </select>           
+							            </select>     
                                     </div>
                                 </div>
                             </div>
@@ -218,6 +267,7 @@
     </div>
     <?php echo form_close(); ?>
 </div>
+
 <div class="modal fade" id="task_item_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <?php echo form_open_multipart(admin_url().'mailbox/conversationTask', ['id'=>'task_assign_form']); ?>
     <div class="modal-dialog" role="document">
@@ -250,7 +300,7 @@
                                                 $rel_val = get_relation_values($rel_data,'customer');
                                                 echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
                                             } ?>							
-							            </select>           
+							            </select>     
                                     </div>
                                 </div>
                             </div>

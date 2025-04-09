@@ -220,3 +220,24 @@ function get_mail_tags($active = true)
 
     return  $CI->db->get(db_prefix().'mail_tags')->result_array();
 }
+
+/**
+ * Get email tags.
+ *
+ * @param int    $active
+ * @param string $type
+ *
+ * @return array
+ */
+function get_mail_templates($active = true)
+{
+    $CI = &get_instance();
+    $CI->db->where('language', 'english');
+    if ($active == true) {
+        $CI->db->where('active', true);
+    } else if ($active == false) {
+        $CI->db->where('active', false);
+    }
+
+    return  $CI->db->get(db_prefix().'emailtemplates')->result_array();
+}

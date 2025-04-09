@@ -156,3 +156,10 @@ img.mr-2.rounded-circle {
     cursor: pointer;
     padding: 5px 0;
 }
+
+.select-wrapper > span {
+    width: 120px;
+}
+.select-wrapper > select {
+    width: calc(100% - 120px);
+}
