@@ -173,11 +173,10 @@ function scan_email_server()
         $CI->db->select()->from(db_prefix() . 'staff')->where(db_prefix() . 'staff.mail_password !=', '');
         $staffs = $CI->db->get()->result_array();
         
-        $CI->db->select()->from(db_prefix() . 'mail_inbox')->where(db_prefix() . 'mail_inbox.auto_reply', true);
-        $inbox_mails = $CI->db->get()->result_array();
-        
         $CI->db->select()->from(db_prefix() . 'mail_auto_replies')->where(db_prefix() . 'mail_auto_replies.active', true);
         $mail_auto_replies = $CI->db->get()->result_array();
+
+        $inbox_email_ids = [];
 
         require_once __DIR__ . '/third_party/php-imap/Imap.php';
         include_once __DIR__ . '/third_party/simple_html_dom.php';
@@ -328,6 +327,7 @@ function scan_email_server()
 
                     $CI->db->insert(db_prefix().'mail_inbox', $inbox);
                     $inbox_id = $CI->db->insert_id();
+                    $inbox_email_ids[] = $inbox_id;
                     $path     = MAILBOX_MODULE_UPLOAD_FOLDER.'/inbox/'.$inbox_id.'/';
                     foreach ($data['attachments'] as $attachment) {
                         $filename      = $attachment['filename'];
@@ -369,10 +369,24 @@ function scan_email_server()
             }
         }
         
-        foreach ($inbox_mails as $inbox_mail) {
-            if ($inbox_mail['from_staff_id']) {
-                foreach ($mail_auto_replies as $mail_auto_reply) {
-                    if ($inbox_mail['templateid'] == $mail_auto_reply['receiveid']) {
+        if (count($inbox_email_ids)) {
+            $CI->db->select()->from(db_prefix() . 'mail_inbox')->where_in('id', $inbox_email_ids);
+            $inbox_mails = $CI->db->get()->result_array();
+            foreach ($inbox_mails as $inbox_mail) {
+                if ($inbox_mail['from_staff_id']) {
+                    $mail_inbox_auto_reply = null;
+                    foreach ($mail_auto_replies as $mail_auto_reply) {
+                        if ($mail_auto_reply['receiveid']) {
+                            if ($inbox_mail['templateid'] == $mail_auto_reply['receiveid']) {
+                                $mail_inbox_auto_reply = $mail_auto_reply;
+                            }
+                        } else {
+                            if (preg_match($mail_auto_reply['pattern'], $inbox_mail['subject']) || preg_match($mail_auto_reply['pattern'], $inbox_mail['body'])) {
+                                $mail_inbox_auto_reply = $mail_auto_reply;
+                            }
+                        }
+                    }
+                    if ($mail_inbox_auto_reply) {
                         $CI->email->initialize();
                         $CI->load->library('email');
                         $CI->email->clear(true);
@@ -385,8 +399,16 @@ function scan_email_server()
 
                         $CI->email->from($to_staff->email, get_staff_full_name($inbox_mail['to_staff_id']));
                         $CI->email->to(str_replace(';', ',', $from_staff->email));
-                        $CI->email->subject($inbox_mail->subject);
-                        $CI->email->message($inbox_mail->body);
+                        if ($mail_inbox_auto_reply['replyid']) {
+                            $CI->db->select()->from(db_prefix() . 'emailtemplates')->where(db_prefix() . 'emailtemplates.emailtemplateid', $mail_inbox_auto_reply['replyid']);
+                            $auto_reply_emailtemplate = $CI->db->get()->row();
+
+                            $CI->email->subject($auto_reply_emailtemplate->subject);
+                            $CI->email->message($auto_reply_emailtemplate->message);
+                        } else {
+                            $CI->email->subject($mail_inbox_auto_reply['subject']);
+                            $CI->email->message($mail_inbox_auto_reply['body']);
+                        }
                         $inobx_attach_dir = module_dir_url(MAILBOX_MODULE).'uploads/inbox/'.$in_id;
                         if (file_exists($inobx_attach_dir)) {
                             $inobx_files = scandir($inobx_attach_dir);
@@ -396,11 +418,6 @@ function scan_email_server()
                             }
                         }
                         $CI->email->send(true);
-
-                        $CI->db->where('id', $inbox_mail['id']);
-                        $CI->db->update(db_prefix().'mail_inbox', [
-                            'auto_reply' => false,
-                        ]);
                     }
                 }
             }

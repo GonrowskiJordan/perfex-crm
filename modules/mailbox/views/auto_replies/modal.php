@@ -27,6 +27,7 @@
             <div class="form-group select-placeholder">
                 <label for="receiveid" class="control-label"><?= _l('mailbox_receive_template'); ?></label>
                 <select name="receiveid" data-live-search="true" id="receiveid" class="form-control selectpicker" data-none-selected-text="<?= _l('dropdown_non_selected_tex'); ?>">
+                    <option></option>
                     <?php foreach ($email_templates as $email_template) { ?>
                         <option value="<?= $email_template['emailtemplateid']; ?>" <?= isset($auto_reply) && $auto_reply->receiveid == $email_template['emailtemplateid'] ? 'selected' : ''; ?>>
                             <?= e($email_template['name']); ?>
@@ -35,9 +36,12 @@
                 </select>
             </div>
 
+            <?php echo render_input('pattern', 'mailbox_pattern', (isset($auto_reply) ? $auto_reply->pattern : '')); ?>
+
             <div class="form-group select-placeholder">
                 <label for="replyid" class="control-label"><?= _l('mailbox_reply_template'); ?></label>
                 <select name="replyid" data-live-search="true" id="replyid" class="form-control selectpicker" data-none-selected-text="<?= _l('dropdown_non_selected_tex'); ?>">
+                    <option></option>
                     <?php foreach ($email_templates as $email_template) { ?>
                         <option value="<?= $email_template['emailtemplateid']; ?>" <?= isset($auto_reply) && $auto_reply->replyid == $email_template['emailtemplateid'] ? 'selected' : ''; ?>>
                             <?= e($email_template['name']); ?>
@@ -45,6 +49,10 @@
                     <?php } ?>
                 </select>
             </div>
+
+            <?php echo render_input('subject', 'mailbox_subject', (isset($auto_reply) ? $auto_reply->subject : '')); ?>
+
+            <?php echo render_textarea('body', 'mailbox_body', (isset($auto_reply) ? $auto_reply->body : ''), [], [], '', 'tinymce tinymce-compose'); ?>
 
             <?php $rel_id = (isset($auto_reply) ? $auto_reply->id : false); ?>
             <?= render_custom_fields('maibox_auto_replies', $rel_id); ?>

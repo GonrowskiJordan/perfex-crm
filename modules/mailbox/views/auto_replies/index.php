@@ -20,7 +20,9 @@
                         <?php
                             $table_data = [
                                 _l('name'),
+                                _l('mailbox_pattern'),
                                 _l('mailbox_receive_template'),
+                                _l('mailbox_subject'),
                                 _l('mailbox_reply_template'),
                                 [
                                     'name' => _l('mailbox_active'),

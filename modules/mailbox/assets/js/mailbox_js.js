@@ -349,6 +349,7 @@ function view_mailbox_auto_reply(auto_reply_id) {
         init_datepicker();
         custom_fields_hyperlink();
         validate_mailbox_auto_reply_form();
+        fire_auto_reply_form();
     }).fail(function(error) {
         var response = JSON.parse(error.responseText);
 
@@ -369,6 +370,32 @@ function unassgin_customer(client_id, mail_id, type='inbox') {
         } else {
             alert_float('warning', response.message);
         }
+    });
+}
+
+function check_auto_reply() {
+    if ($('#autoReplyModal #receiveid').val()) {
+        $('#autoReplyModal .form-group[app-field-wrapper="pattern"]').hide();
+    } else {
+        $('#autoReplyModal .form-group[app-field-wrapper="pattern"]').show();
+    }
+    if ($('#autoReplyModal #replyid').val()) {
+        $('#autoReplyModal .form-group[app-field-wrapper="subject"]').hide();
+        $('#autoReplyModal .form-group[app-field-wrapper="body"]').hide();
+    } else {
+        $('#autoReplyModal .form-group[app-field-wrapper="subject"]').show();
+        $('#autoReplyModal .form-group[app-field-wrapper="body"]').show();
+    }
+}
+
+function fire_auto_reply_form() {
+    check_auto_reply();
+
+    $('#autoReplyModal #receiveid').change(function() {
+        check_auto_reply();
+    });
+    $('#autoReplyModal #replyid').change(function() {
+        check_auto_reply();
     });
 }
 

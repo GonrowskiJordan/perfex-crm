@@ -92,7 +92,10 @@ if (!$CI->db->table_exists(db_prefix().'mail_auto_replies')) {
     `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` varchar(127) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
     `receiveid` int(11) UNSIGNED,
+    `pattern` VARCHAR(250) NOT NULL,
     `replyid` int(11) UNSIGNED,
+    `subject` LONGTEXT NULL,
+    `body` LONGTEXT NULL,
     `active` tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=".$CI->db->char_set.';');
@@ -120,10 +123,6 @@ if (!$CI->db->field_exists('tagid', 'mail_inbox')) {
   $CI->db->query('ALTER TABLE `'.db_prefix().'mail_inbox` ADD COLUMN `tagid` int(11);');
 }
 
-if (!$CI->db->field_exists('auto_reply', 'mail_inbox')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_inbox` ADD COLUMN `auto_reply` tinyint(1) NOT NULL DEFAULT "0"');
-}
-
 if (!$CI->db->field_exists('templateid', 'mail_outbox')) {
   $CI->db->query('ALTER TABLE `'.db_prefix().'mail_outbox` ADD COLUMN `templateid` int(11);');
 }
@@ -142,6 +141,18 @@ if (!$CI->db->field_exists('replyid', 'emailtemplates')) {
 
 if (!$CI->db->field_exists('autoreply', 'emailtemplates')) {
   $CI->db->query('ALTER TABLE `'.db_prefix().'emailtemplates` ADD COLUMN `autoreply` tinyint(1) NOT NULL DEFAULT "0";');
+}
+
+if (!$CI->db->field_exists('pattern', 'mail_auto_replies')) {
+  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_auto_replies` ADD COLUMN `pattern` VARCHAR(250) NOT NULL;');
+}
+
+if (!$CI->db->field_exists('subject', 'mail_auto_replies')) {
+  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_auto_replies` ADD COLUMN `subject` LONGTEXT NULL;');
+}
+
+if (!$CI->db->field_exists('body', 'mail_auto_replies')) {
+  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_auto_replies` ADD COLUMN `body` LONGTEXT NULL;');
 }
 
 if (!$CI->db->field_exists('mail_password', 'staff')) {

@@ -89,3 +89,5 @@ $lang['customers_unassign_successfully']								= 'Успішно скасова
 $lang['customer_emails']									            = 'Електронні адреси клієнтів';
 $lang['mailbox_from_to']									            = 'Від - До';
 $lang['mailbox_group']									                = 'Група';
+$lang['mailbox_pattern']									            = 'Візерунок';
+$lang['mailbox_body']									                = 'Тіло';

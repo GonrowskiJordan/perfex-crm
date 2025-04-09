@@ -4,7 +4,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $aColumns = [
     db_prefix() . 'mail_auto_replies.name',
+    db_prefix() . 'mail_auto_replies.pattern',
     'receive_templates.name as receive_name',
+    db_prefix() . 'mail_auto_replies.subject',
     'reply_templates.name as reply_name',
     db_prefix() . 'mail_auto_replies.active',
 ];
@@ -20,6 +22,8 @@ $where = [];
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_auto_replies.id',
     db_prefix() . 'mail_auto_replies.name',
+    db_prefix() . 'mail_auto_replies.pattern',
+    db_prefix() . 'mail_auto_replies.subject',
     db_prefix() . 'mail_auto_replies.active'
 ]);
 
@@ -36,7 +40,9 @@ foreach ($rResult as $aRow) {
     $nameRow .= '</div>';
     $row[] = $nameRow;
     
+    $row[] = '<span>'.$aRow['pattern'].'</span>';
     $row[] = '<span>'.$aRow['receive_name'].'</span>';
+    $row[] = '<span>'.$aRow['subject'].'</span>';
     $row[] = '<span>'.$aRow['reply_name'].'</span>';
     
     $outputActive = '<div class="onoffswitch">

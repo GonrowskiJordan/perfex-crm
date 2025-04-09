@@ -141,14 +141,6 @@ class Mailbox_model extends App_Model
                     $ci->email->attach($attachment_url);
                 }
                 $ci->email->send(true);
-
-                if ($data['templateid']) {
-                    foreach ($mail_auto_replies as $mail_auto_reply) {
-                        if ($mail_auto_reply['receiveid'] == $data['templateid']) {
-
-                        }
-                    }
-                }
             }
         }
 

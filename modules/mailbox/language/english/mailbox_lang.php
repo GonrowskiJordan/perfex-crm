@@ -88,3 +88,5 @@ $lang['customers_unassign_successfully']								= 'Customers UnAssigned Successf
 $lang['customer_emails']									            = 'Client Emails';
 $lang['mailbox_from_to']									            = 'From - To';
 $lang['mailbox_group']									                = 'Group';
+$lang['mailbox_pattern']									            = 'Pattern';
+$lang['mailbox_body']									                = 'Body';

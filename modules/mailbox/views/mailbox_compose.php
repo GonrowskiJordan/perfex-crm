@@ -65,9 +65,9 @@
             <hr />
             <?php 
                 if ($mail_signature !== null) {
-                    echo render_textarea('body', '', $body.$mail_signature, [], [], '', 'tinymce tinymce-compose');
+                    echo render_textarea('body', 'mailbox_body', $body.$mail_signature, [], [], '', 'tinymce tinymce-compose');
                 } else {
-                    echo render_textarea('body', '', $body, [], [], '', 'tinymce tinymce-compose');
+                    echo render_textarea('body', 'mailbox_body', $body, [], [], '', 'tinymce tinymce-compose');
                 }
             ?>
         </div>
