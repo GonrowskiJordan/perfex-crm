@@ -3,14 +3,12 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $aColumns = [
-    db_prefix() . 'mail_inbox.to',
+    db_prefix() . 'mail_inbox.id',
     db_prefix() . 'mail_inbox.sender_name',
     db_prefix() . 'mail_inbox.subject',
-    db_prefix() . 'mail_inbox.date_received',
-    db_prefix() . 'mail_tags.id as tag_id',
     db_prefix() . 'mail_tags.name as tag_name',
-    db_prefix() . 'emailtemplates.emailtemplateid as template_id',
     db_prefix() . 'emailtemplates.name as template_name',
+    db_prefix() . 'mail_inbox.date_received',
 ];
 
 $sIndexColumn = 'id';
@@ -37,9 +35,9 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_inbox.stared',
     db_prefix() . 'mail_inbox.important',
     db_prefix() . 'mail_inbox.sender_name',
+    db_prefix() . 'mail_inbox.subject',
     db_prefix() . 'mail_inbox.body',
     db_prefix() . 'mail_inbox.read',
-    db_prefix() . 'mail_inbox.subject',
     db_prefix() . 'mail_inbox.date_received'
 ]);
 

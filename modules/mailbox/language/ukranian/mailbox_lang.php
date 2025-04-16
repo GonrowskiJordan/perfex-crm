@@ -60,6 +60,7 @@ $lang['lead_group_email']												= 'Lead Email';
 $lang['lead_source']													= 'Lead Source (Numberic value)';
 $lang['lead_status']													= 'Lead Status (Set to 1 for Active)';
 $lang['contacts']													    = 'Контакти';
+$lang['mailbox_emails']									                = 'Електронні листи';
 $lang['mailbox_tag']													= 'Тег поштової скриньки';
 $lang['mailbox_tags']													= 'Теги поштових скриньок';
 $lang['new_mailbox_tag']												= 'Додати тег поштової скриньки';

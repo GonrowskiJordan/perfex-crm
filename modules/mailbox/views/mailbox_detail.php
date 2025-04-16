@@ -31,24 +31,6 @@
                 <div class="media-title text-dark font-weight-semiblod"><?php echo $mailbox->sender_name; ?> <span class="text-muted">( <?php echo $mailbox->from_email; ?> )</span></div>
                 <p class="mb-0 font-weight-semiblod">To: <?php echo $mailbox->to; ?></p>
                 <p class="mb-0 font-weight-semiblod">Cc: <?php echo $mailbox->cc; ?></p>
-                <div class="mb-0 font-weight-semiblod tw-flex mtop5 select-wrapper">
-                    <span><?php echo _l('mailbox_tag') ?>: </span>
-                    <select class="mail-tag" data-id="<?php echo $mailbox->id; ?>" data-type="inbox">
-                        <option></option>
-                        <?php foreach (get_mail_tags() as $mailbox_tag) { ?>
-                            <option data-id="<?php echo $mailbox_tag['id'] ?>" <?php echo ($mailbox_tag['id'] == $mailbox->tagid ? 'selected' : '') ?>><?php echo $mailbox_tag['name'] ?></option>
-                        <?php } ?>
-                    </select>
-                </div>
-                <div class="mb-0 font-weight-semiblod tw-flex mtop5 select-wrapper">
-                    <span><?php echo _l('email_template') ?>: </span>
-                    <select class="mail-template" data-id="<?php echo $mailbox->id; ?>" data-type="inbox">
-                        <option></option>
-                        <?php foreach (get_mail_templates() as $mailbox_template) { ?>
-                            <option data-id="<?php echo $mailbox_template['emailtemplateid'] ?>" <?php echo ($mailbox_template['emailtemplateid'] == $mailbox->templateid ? 'selected' : '') ?>><?php echo $mailbox_template['name'] ?></option>
-                        <?php } ?>
-                    </select>
-                </div>
             </div>
         </div>
     </div>
@@ -81,6 +63,12 @@
     </div>
 
     <div class="pull-right">
+        <select class="mail-tag mbot10" data-id="<?php echo $mailbox->id; ?>" data-type="inbox">
+            <option></option>
+            <?php foreach (get_mail_tags() as $mailbox_tag) { ?>
+                <option data-id="<?php echo $mailbox_tag['id'] ?>" <?php echo ($mailbox_tag['id'] == $mailbox->tagid ? 'selected' : '') ?>><?php echo $mailbox_tag['name'] ?></option>
+            <?php } ?>
+        </select>
         <a class="btn btn-info mbot10" type="button" data-toggle="modal" data-target="#customers_item_modal"><i class="fa fa-user"></i> <?php echo _l('assign_customers'); ?></a>
         <a class="btn btn-danger mbot10" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data?email_subject=' . urlencode($mailbox->subject) . '&email_body=' . urlencode($mailbox->body)); ?>"><i class="fa fa-tasks"></i> <?php echo _l('assign_task'); ?></a>
         <button class="btn btn-success mbot10" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>

@@ -121,7 +121,7 @@ class Mailbox extends AdminController
         $data['clients']        = $this->mailbox_model->select_client();
         $data['leads']          = $this->mailbox_model->select_lead();
         $data['tickets']        =  $this->mailbox_model->select_ticket();
-        $data['inbox_id']       = $id;
+        $data['mailbox_id']     = $id;
         $data['bodyclass']      = 'dynamic-create-groups';
         $this->load->view('mailbox', $data);
     }
@@ -144,7 +144,7 @@ class Mailbox extends AdminController
         $data['attachments']    = $this->mailbox_model->get_mail_attachment($id, 'outbox');
         $data['leads']          = $this->mailbox_model->select_lead();
         $data['tickets']        = $this->mailbox_model->select_ticket();
-        $data['outbox_id']      = $id;
+        $data['mailbox_id']     = $id;
         $data['bodyclass']      = 'dynamic-create-groups';
         $this->load->view('mailbox', $data);
     }
@@ -594,6 +594,15 @@ class Mailbox extends AdminController
         $this->load->view('email_templates/index', $data);
     }
 
+    public function get_email_template($email_template_id = '') {      
+        if ($this->input->is_ajax_request())
+        {  
+            $email_template = $this->emails_model->get_email_template_by_id($email_template_id);
+            echo json_encode($email_template);
+            exit;
+        }
+    }
+
     public function form_email_template($email_template_id = '') {
 		$email_template_id = $data['emailtemplateid'] = $email_template_id ? $email_template_id : '';
 
@@ -903,6 +912,51 @@ class Mailbox extends AdminController
     {
         if ($this->input->is_ajax_request()) {
             $this->app->get_table_data(module_views_path('mailbox', 'table_client_emails'), ['client_id' => $client_id]);
+        }
+    }
+
+    public function check_cron() {
+        $CI = &get_instance();
+        $CI->db->select()->from(db_prefix() . 'scheduled_emails')
+            ->where(db_prefix() . 'scheduled_emails.rel_type', 'mail_outbox')
+            ->where(db_prefix() . 'scheduled_emails.scheduled_at <=', date('Y-m-d H:i:s'));
+        $scheduled_emails = $CI->db->get()->result_array();
+        foreach ($scheduled_emails as $scheduled_email) {
+            $CI->db->select()->from(db_prefix() . 'mail_outbox')
+                ->where(db_prefix() . 'mail_outbox.id', $scheduled_email['rel_id']);
+            $mail_outbox = $CI->db->get()->row();
+
+            if ($mail_outbox) {
+                $CI->db->where('staffid', $mail_outbox->sender_staff_id);
+                $staff = $CI->db->select('email')->from(db_prefix().'staff')->get()->row();
+    
+                $CI->email->initialize();
+                $CI->load->library('email');
+                $CI->email->clear(true);
+                $CI->email->from($staff->email, $mail_outbox->sender_name);
+                $CI->email->to(str_replace(';', ',', $mail_outbox->to));
+                if (isset($mail_outbox->cc) && strlen($mail_outbox->cc) > 0) {
+                    $CI->email->cc($mail_outbox->cc);
+                }
+                $CI->email->subject($mail_outbox->subject);
+                $CI->email->message($mail_outbox->body);
+                $outobx_attach_dir = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$mail_outbox->id;
+                if (file_exists($outobx_attach_dir)) {
+                    $outbox_files = scandir($outobx_attach_dir);
+                    $outbox_files = array_diff($outbox_files, array(".", ".."));
+                    foreach ($outbox_files as $outbox_file) {
+                        $CI->email->attach($outobx_attach_dir.'/'.$outbox_file);
+                    }
+                }
+                try {
+                    $CI->email->send(true);
+                } catch (Exception $e) {
+                    echo " Send Email: ";
+                    print_r($e);
+                }
+            }
+            $CI->db->where(db_prefix() . 'scheduled_emails.id', $scheduled_email['id'])
+                ->delete(db_prefix() . 'scheduled_emails');
         }
     }
 }

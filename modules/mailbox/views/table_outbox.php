@@ -3,15 +3,13 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $aColumns = [
-    db_prefix() . 'mail_outbox.to',
+    db_prefix() . 'mail_outbox.id',
     db_prefix() . 'mail_outbox.sender_name',
+    db_prefix() . 'mail_outbox.to',
     db_prefix() . 'mail_outbox.subject',
-    db_prefix() . 'mail_outbox.date_sent',
-    db_prefix() . 'mail_outbox.scheduled_at',
-    db_prefix() . 'mail_tags.id as tag_id',
     db_prefix() . 'mail_tags.name as tag_name',
-    db_prefix() . 'emailtemplates.emailtemplateid as template_id',
     db_prefix() . 'emailtemplates.name as template_name',
+    db_prefix() . 'mail_outbox.scheduled_at'
 ];
 
 $sIndexColumn = 'id';
@@ -34,8 +32,8 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_outbox.has_attachment',
     db_prefix() . 'mail_outbox.stared',
     db_prefix() . 'mail_outbox.important',
-    db_prefix() . 'mail_outbox.body',
     db_prefix() . 'mail_outbox.subject',
+    db_prefix() . 'mail_outbox.body',
     db_prefix() . 'mail_outbox.date_sent',
     db_prefix() . 'mail_outbox.scheduled_at'
 ]);

@@ -24,18 +24,6 @@
             <?php $value = (isset($auto_reply) ? $auto_reply->name : ''); ?>
             <?= render_input('name', 'name', $value); ?>
 
-            <div class="form-group select-placeholder">
-                <label for="receiveid" class="control-label"><?= _l('mailbox_receive_template'); ?></label>
-                <select name="receiveid" data-live-search="true" id="receiveid" class="form-control selectpicker" data-none-selected-text="<?= _l('dropdown_non_selected_tex'); ?>">
-                    <option></option>
-                    <?php foreach ($email_templates as $email_template) { ?>
-                        <option value="<?= $email_template['emailtemplateid']; ?>" <?= isset($auto_reply) && $auto_reply->receiveid == $email_template['emailtemplateid'] ? 'selected' : ''; ?>>
-                            <?= e($email_template['name']); ?>
-                        </option>
-                    <?php } ?>
-                </select>
-            </div>
-
             <?php echo render_input('pattern', 'mailbox_pattern', (isset($auto_reply) ? $auto_reply->pattern : '')); ?>
 
             <div class="form-group select-placeholder">

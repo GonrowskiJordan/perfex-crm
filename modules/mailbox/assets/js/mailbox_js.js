@@ -279,12 +279,60 @@ function view_mailbox_email_template(template_id) {
     });
 }
 
-$('#mailbox_compose_form [name="templateid"]').change(function() {
-    if ($(this).val()) {
-        $('#mailbox_compose_form [name="body"]').parent().hide();
-    } else {
-        $('#mailbox_compose_form [name="body"]').parent().show();
+function check_email_template() {
+    let mailbox_templateid = $('#mailbox_compose_form [name="templateid"]').val() ? $('#mailbox_compose_form [name="templateid"]').val() : '';
+    if (mailbox_templateid) {
+        $.ajax({
+            type: 'GET',
+            url: admin_url + '/mailbox/get_email_template/' + mailbox_templateid,
+        }).done(function(response) {
+            response = JSON.parse(response);
+
+            tinymce.remove('#mailbox_compose_form [name="body"]');
+            $('#mailbox_compose_form [name="body"]').val(response.message);            
+            tinymce.init({
+                branding: false,
+                promotion: false,
+                selector: '#mailbox_compose_form [name="body"]',
+                browser_spellcheck: true,
+                cache_suffix: '?v=' + app.version,
+                height: 250,
+                min_height: 250,
+                statusbar: false,
+                theme: "silver",
+                paste_block_drop: true,
+                language: app.tinymce_lang || 'en',
+                relative_urls: false,
+                entity_encoding: "raw",
+                autoresize_bottom_margin: 25,
+                valid_elements: "+*[*]",
+                valid_children: "+body[style], +style[type]",
+                remove_script_host: false,
+                removed_menuitems: "newdocument restoredraft",
+                forced_root_block: "p",
+                autosave_restore_when_empty: false,
+                font_size_formats: "8pt 10pt 12pt 14pt 18pt 24pt 36pt",
+                table_default_styles: {
+                  width: "100%",
+                },
+                plugins: ["advlist", "autoresize", "autosave", "lists", "link", "image", "codesample", "visualblocks", "code", "fullscreen", "media", "save", "table", ],
+                toolbar: "fontfamily fontsize | forecolor backcolor | bold italic | alignleft aligncenter alignright alignjustify | image link | bullist numlist | restoredraft",
+                contextmenu: "link image | paste copy",
+                file_picker_callback: elFinderBrowser,
+                setup: function(editor) {
+                    editor.on('init', function() {
+                        editor.setContent(response.message);
+                    });
+                }
+            });
+        }).fail(function(error) {
+            alert_float('danger', JSON.parse(error.responseText));
+        });
     }
+}
+
+$('#mailbox_compose_form [name="templateid"]').change(function() {
+    check_email_template();
 });
 
 function mailboxAutoReplyFormHandler(form) {
@@ -321,8 +369,7 @@ function mailboxAutoReplyFormHandler(form) {
 function validate_mailbox_auto_reply_form() {
     appValidateForm('#mailbox-auto-reply-form', {
         name: 'required',
-        receiveid: 'required',
-        replyid: 'required',
+        pattern: 'required',
     }, mailboxAutoReplyFormHandler);
 }
 
@@ -349,7 +396,6 @@ function view_mailbox_auto_reply(auto_reply_id) {
         init_datepicker();
         custom_fields_hyperlink();
         validate_mailbox_auto_reply_form();
-        fire_auto_reply_form();
     }).fail(function(error) {
         var response = JSON.parse(error.responseText);
 
@@ -370,32 +416,6 @@ function unassgin_customer(client_id, mail_id, type='inbox') {
         } else {
             alert_float('warning', response.message);
         }
-    });
-}
-
-function check_auto_reply() {
-    if ($('#autoReplyModal #receiveid').val()) {
-        $('#autoReplyModal .form-group[app-field-wrapper="pattern"]').hide();
-    } else {
-        $('#autoReplyModal .form-group[app-field-wrapper="pattern"]').show();
-    }
-    if ($('#autoReplyModal #replyid').val()) {
-        $('#autoReplyModal .form-group[app-field-wrapper="subject"]').hide();
-        $('#autoReplyModal .form-group[app-field-wrapper="body"]').hide();
-    } else {
-        $('#autoReplyModal .form-group[app-field-wrapper="subject"]').show();
-        $('#autoReplyModal .form-group[app-field-wrapper="body"]').show();
-    }
-}
-
-function fire_auto_reply_form() {
-    check_auto_reply();
-
-    $('#autoReplyModal #receiveid').change(function() {
-        check_auto_reply();
-    });
-    $('#autoReplyModal #replyid').change(function() {
-        check_auto_reply();
     });
 }
 

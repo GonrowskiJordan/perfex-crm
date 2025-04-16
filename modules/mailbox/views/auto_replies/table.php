@@ -5,7 +5,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $aColumns = [
     db_prefix() . 'mail_auto_replies.name',
     db_prefix() . 'mail_auto_replies.pattern',
-    'receive_templates.name as receive_name',
     db_prefix() . 'mail_auto_replies.subject',
     'reply_templates.name as reply_name',
     db_prefix() . 'mail_auto_replies.active',
@@ -15,7 +14,6 @@ $sIndexColumn = 'id';
 $sTable       = db_prefix() . 'mail_auto_replies';
 
 $join = [
-    'LEFT JOIN ' . db_prefix() . 'emailtemplates as receive_templates ON ' . 'receive_templates.emailtemplateid = ' . db_prefix() . 'mail_auto_replies.receiveid',
     'LEFT JOIN ' . db_prefix() . 'emailtemplates as reply_templates ON ' . 'reply_templates.emailtemplateid = ' . db_prefix() . 'mail_auto_replies.replyid'
 ];
 $where = [];
@@ -41,7 +39,6 @@ foreach ($rResult as $aRow) {
     $row[] = $nameRow;
     
     $row[] = '<span>'.$aRow['pattern'].'</span>';
-    $row[] = '<span>'.$aRow['receive_name'].'</span>';
     $row[] = '<span>'.$aRow['subject'].'</span>';
     $row[] = '<span>'.$aRow['reply_name'].'</span>';
     

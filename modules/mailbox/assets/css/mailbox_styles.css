@@ -157,9 +157,7 @@ img.mr-2.rounded-circle {
     padding: 5px 0;
 }
 
-.select-wrapper > span {
-    width: 120px;
-}
-.select-wrapper > select {
-    width: calc(100% - 120px);
+.mail-tag {
+    display: inline;
+    padding: 0.35rem 0.5rem;
 }

@@ -91,7 +91,6 @@ if (!$CI->db->table_exists(db_prefix().'mail_auto_replies')) {
   $CI->db->query('CREATE TABLE `'.db_prefix()."mail_auto_replies` (
     `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` varchar(127) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-    `receiveid` int(11) UNSIGNED,
     `pattern` VARCHAR(250) NOT NULL,
     `replyid` int(11) UNSIGNED,
     `subject` LONGTEXT NULL,

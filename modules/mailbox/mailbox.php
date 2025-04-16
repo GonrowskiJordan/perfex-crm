@@ -73,14 +73,14 @@ function mailbox_module_init_menu_items()
         }
 
         $CI->app_menu->add_sidebar_menu_item('mailbox', [
-            'name'     => _l('mailbox'),
+            'name'     => _l('mailbox') . $badge,
             'icon'     => 'fa fa-envelope-square',
             'href'     => admin_url('mailbox'),
             'position' => 6,
         ]);
         $CI->app_menu->add_sidebar_children_item('mailbox', [
             'slug'     => 'mailbox-emails',
-            'name'     => _l('mailbox') . $badge,
+            'name'     => _l('mailbox_emails'),
             'href'     => admin_url('mailbox'),
             'position' => 1,
             'badge'    => [],
@@ -376,14 +376,8 @@ function scan_email_server()
                 if ($inbox_mail['from_staff_id']) {
                     $mail_inbox_auto_reply = null;
                     foreach ($mail_auto_replies as $mail_auto_reply) {
-                        if ($mail_auto_reply['receiveid']) {
-                            if ($inbox_mail['templateid'] == $mail_auto_reply['receiveid']) {
-                                $mail_inbox_auto_reply = $mail_auto_reply;
-                            }
-                        } else {
-                            if (preg_match($mail_auto_reply['pattern'], $inbox_mail['subject']) || preg_match($mail_auto_reply['pattern'], $inbox_mail['body'])) {
-                                $mail_inbox_auto_reply = $mail_auto_reply;
-                            }
+                        if (preg_match($mail_auto_reply['pattern'], $inbox_mail['subject']) || preg_match($mail_auto_reply['pattern'], $inbox_mail['body'])) {
+                            $mail_inbox_auto_reply = $mail_auto_reply;
                         }
                     }
                     if ($mail_inbox_auto_reply) {
@@ -439,28 +433,32 @@ function send_schedule_emails()
             ->where(db_prefix() . 'mail_outbox.id', $scheduled_email['rel_id']);
         $mail_outbox = $CI->db->get()->row();
 
-        $CI->db->where('staffid', $mail_outbox->sender_staff_id);
-        $staff = $CI->db->select('email')->from(db_prefix().'staff')->get()->row();
+        if ($mail_outbox) {
+            $CI->db->where('staffid', $mail_outbox->sender_staff_id);
+            $staff = $CI->db->select('email')->from(db_prefix().'staff')->get()->row();
 
-        $CI->email->initialize();
-        $CI->load->library('email');
-        $CI->email->clear(true);
-        $CI->email->from($mail_outbox->from_email, $mail_outbox->sender_name);
-        $CI->email->to(str_replace(';', ',', $mail_outbox->to));
-        if (isset($mail_outbox->cc) && strlen($mail_outbox->cc) > 0) {
-            $CI->email->cc($mail_outbox->cc);
-        }
-        $CI->email->subject($mail_outbox->subject);
-        $CI->email->message($mail_outbox->body);
-        $outobx_attach_dir = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$outbox_id;
-        if (file_exists($outobx_attach_dir)) {
-            $outbox_files = scandir($outobx_attach_dir);
-            $outbox_files = array_diff($outbox_files, array(".", ".."));
-            foreach ($outbox_files as $outbox_file) {
-                $CI->email->attach($outobx_attach_dir.'/'.$outbox_file);
+            $CI->email->initialize();
+            $CI->load->library('email');
+            $CI->email->clear(true);
+            $CI->email->from($staff->email, $mail_outbox->sender_name);
+            $CI->email->to(str_replace(';', ',', $mail_outbox->to));
+            if (isset($mail_outbox->cc) && strlen($mail_outbox->cc) > 0) {
+                $CI->email->cc($mail_outbox->cc);
             }
+            $CI->email->subject($mail_outbox->subject);
+            $CI->email->message($mail_outbox->body);
+            $outobx_attach_dir = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$mail_outbox->id;
+            if (file_exists($outobx_attach_dir)) {
+                $outbox_files = scandir($outobx_attach_dir);
+                $outbox_files = array_diff($outbox_files, array(".", ".."));
+                foreach ($outbox_files as $outbox_file) {
+                    $CI->email->attach($outobx_attach_dir.'/'.$outbox_file);
+                }
+            }
+            $CI->email->send(true);
         }
-        $CI->email->send(true);
+        $CI->db->where(db_prefix() . 'scheduled_emails.id', $scheduled_email['id'])
+            ->delete(db_prefix() . 'scheduled_emails');
     }
 }
 
