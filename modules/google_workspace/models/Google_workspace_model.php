@@ -97,7 +97,7 @@ class Google_workspace_model extends App_Model
             'title'             => $data['title'],
             'description'       => isset($data['description']) ? $data['description'] : '',
             'type'              => $data['type'],
-            'status'            => $data['status'],
+            'status'            => isset($data['status']) ? $data['status'] : 'Public',
             'date'              => $date_created
         ]);
         $google_workspace_id = $this->db->insert_id();

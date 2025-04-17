@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<?php echo form_open_multipart($this->uri->uri_string(), ['id'=>'mailbox_compose_form']); ?>
+<?php echo form_open_multipart($this->uri->uri_string(), ['id'=>'mailbox-compose-form']); ?>
 
 <div class="clearfix mtop20"></div>
 <div class="row">

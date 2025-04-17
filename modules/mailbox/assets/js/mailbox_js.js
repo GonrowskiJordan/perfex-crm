@@ -279,8 +279,51 @@ function view_mailbox_email_template(template_id) {
     });
 }
 
+function init_tinymce_editor(selector, content = '') {
+    tinymce.remove(selector);
+    if (!content) {
+        content = $(selector).val();
+    }
+    $(selector).val(content);
+    tinymce.init({
+        branding: false,
+        promotion: false,
+        selector: selector,
+        browser_spellcheck: true,
+        cache_suffix: '?v=' + app.version,
+        height: 250,
+        min_height: 250,
+        statusbar: false,
+        theme: "silver",
+        paste_block_drop: true,
+        language: app.tinymce_lang || 'en',
+        relative_urls: false,
+        entity_encoding: "raw",
+        autoresize_bottom_margin: 25,
+        valid_elements: "+*[*]",
+        valid_children: "+body[style], +style[type]",
+        remove_script_host: false,
+        removed_menuitems: "newdocument restoredraft",
+        forced_root_block: "p",
+        autosave_restore_when_empty: false,
+        font_size_formats: "8pt 10pt 12pt 14pt 18pt 24pt 36pt",
+        table_default_styles: {
+          width: "100%",
+        },
+        plugins: ["advlist", "autoresize", "autosave", "lists", "link", "image", "codesample", "visualblocks", "code", "fullscreen", "media", "save", "table", ],
+        toolbar: "fontfamily fontsize | forecolor backcolor | bold italic | alignleft aligncenter alignright alignjustify | image link | bullist numlist | restoredraft",
+        contextmenu: "link image | paste copy",
+        file_picker_callback: elFinderBrowser,
+        setup: function(editor) {
+            editor.on('init', function() {
+                editor.setContent(content);
+            });
+        }
+    });
+}
+
 function check_email_template() {
-    let mailbox_templateid = $('#mailbox_compose_form [name="templateid"]').val() ? $('#mailbox_compose_form [name="templateid"]').val() : '';
+    let mailbox_templateid = $('#mailbox-compose-form [name="templateid"]').val() ? $('#mailbox-compose-form [name="templateid"]').val() : '';
     if (mailbox_templateid) {
         $.ajax({
             type: 'GET',
@@ -288,52 +331,36 @@ function check_email_template() {
         }).done(function(response) {
             response = JSON.parse(response);
 
-            tinymce.remove('#mailbox_compose_form [name="body"]');
-            $('#mailbox_compose_form [name="body"]').val(response.message);            
-            tinymce.init({
-                branding: false,
-                promotion: false,
-                selector: '#mailbox_compose_form [name="body"]',
-                browser_spellcheck: true,
-                cache_suffix: '?v=' + app.version,
-                height: 250,
-                min_height: 250,
-                statusbar: false,
-                theme: "silver",
-                paste_block_drop: true,
-                language: app.tinymce_lang || 'en',
-                relative_urls: false,
-                entity_encoding: "raw",
-                autoresize_bottom_margin: 25,
-                valid_elements: "+*[*]",
-                valid_children: "+body[style], +style[type]",
-                remove_script_host: false,
-                removed_menuitems: "newdocument restoredraft",
-                forced_root_block: "p",
-                autosave_restore_when_empty: false,
-                font_size_formats: "8pt 10pt 12pt 14pt 18pt 24pt 36pt",
-                table_default_styles: {
-                  width: "100%",
-                },
-                plugins: ["advlist", "autoresize", "autosave", "lists", "link", "image", "codesample", "visualblocks", "code", "fullscreen", "media", "save", "table", ],
-                toolbar: "fontfamily fontsize | forecolor backcolor | bold italic | alignleft aligncenter alignright alignjustify | image link | bullist numlist | restoredraft",
-                contextmenu: "link image | paste copy",
-                file_picker_callback: elFinderBrowser,
-                setup: function(editor) {
-                    editor.on('init', function() {
-                        editor.setContent(response.message);
-                    });
-                }
-            });
+            init_tinymce_editor('#mailbox-compose-form [name="body"]', response.message);
         }).fail(function(error) {
             alert_float('danger', JSON.parse(error.responseText));
         });
+    } else {
+        init_tinymce_editor('#mailbox-compose-form [name="body"]');
     }
 }
 
-$('#mailbox_compose_form [name="templateid"]').change(function() {
+$('#mailbox-compose-form [name="templateid"]').change(function() {
     check_email_template();
 });
+
+function check_reply_template() {
+    let mailbox_templateid = $('#mailbox-auto-reply-form [name="replyid"]').val() ? $('#mailbox-auto-reply-form [name="replyid"]').val() : '';
+    if (mailbox_templateid) {
+        $.ajax({
+            type: 'GET',
+            url: admin_url + '/mailbox/get_email_template/' + mailbox_templateid,
+        }).done(function(response) {
+            response = JSON.parse(response);
+
+            init_tinymce_editor('#mailbox-auto-reply-form [name="body"]', response.message);
+        }).fail(function(error) {
+            alert_float('danger', JSON.parse(error.responseText));
+        });
+    } else {
+        init_tinymce_editor('#mailbox-auto-reply-form [name="body"]');
+    }
+}
 
 function mailboxAutoReplyFormHandler(form) {
     var formURL = $(form).attr("action");
@@ -396,6 +423,11 @@ function view_mailbox_auto_reply(auto_reply_id) {
         init_datepicker();
         custom_fields_hyperlink();
         validate_mailbox_auto_reply_form();
+
+        $('#mailbox-auto-reply-form [name="replyid"]').change(function() {
+            check_reply_template();
+        });
+        check_reply_template();
     }).fail(function(error) {
         var response = JSON.parse(error.responseText);
 

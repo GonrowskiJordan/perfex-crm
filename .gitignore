@@ -43,3 +43,4 @@ backup/*
 database_backups/
 
 cgi-bin/*
+application/logs

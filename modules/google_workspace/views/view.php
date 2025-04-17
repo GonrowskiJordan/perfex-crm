@@ -6,7 +6,7 @@
     <div class="content">
         <div class="row">
             <div class="col-md-12">
-                <?php if ($status == 'public') { ?>
+                <?php // if ($status == 'Public') { ?>
                     <?php if ($type == 'doc') { ?>
                         <iframe src="https://docs.google.com/document/d/<?php echo $driveid; ?>/edit?usp=sharing" width="100%" height="800"></iframe>
                     <?php } else if ($type == 'sheet') { ?>
@@ -18,9 +18,9 @@
                     <?php } else if ($type == 'drive') { ?>
                         <iframe src="https://drive.google.com/file/d/<?php echo $driveid; ?>/preview" width="100%" height="800"></iframe>
                     <?php } ?>
-                <?php } else { ?>
-                    <iframe src="https://drive.google.com/file/d/<?php echo $driveid; ?>/preview" width="100%" height="800"></iframe>
-                <?php } ?>
+                <?php // } else { ?>
+                    <!-- <iframe src="https://drive.google.com/file/d/<?php echo $driveid; ?>/preview" width="100%" height="800"></iframe> -->
+                <?php // } ?>
             </div>
         </div>
     </div>

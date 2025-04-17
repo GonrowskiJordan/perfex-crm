@@ -111,63 +111,67 @@ if (!$CI->db->table_exists(db_prefix() . 'mail_clients')) {
 }
 
 if (!$CI->db->field_exists('draft', 'mail_outbox')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_outbox` ADD COLUMN `draft` tinyint(1) NOT NULL DEFAULT 0;');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `draft` tinyint(1) NOT NULL DEFAULT 0;');
 }
 
 if (!$CI->db->field_exists('tagid', 'mail_outbox')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_outbox` ADD COLUMN `tagid` int(11);');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `tagid` int(11);');
 }
 
 if (!$CI->db->field_exists('tagid', 'mail_inbox')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_inbox` ADD COLUMN `tagid` int(11);');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_inbox` ADD COLUMN `tagid` int(11);');
 }
 
 if (!$CI->db->field_exists('templateid', 'mail_outbox')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_outbox` ADD COLUMN `templateid` int(11);');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `templateid` int(11);');
 }
 
 if (!$CI->db->field_exists('templateid', 'mail_inbox')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_inbox` ADD COLUMN `templateid` int(11);');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_inbox` ADD COLUMN `templateid` int(11);');
 }
 
 if (!$CI->db->field_exists('scheduled_at', 'mail_outbox')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_outbox` ADD COLUMN `scheduled_at` datetime;');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `scheduled_at` datetime;');
+}
+
+if (!$CI->db->field_exists('scheduled_status', 'mail_outbox')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `scheduled_status` VARCHAR(127)  DEFAULT "";');
 }
 
 if (!$CI->db->field_exists('replyid', 'emailtemplates')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'emailtemplates` ADD COLUMN `replyid` int(11);');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'emailtemplates` ADD COLUMN `replyid` int(11);');
 }
 
 if (!$CI->db->field_exists('autoreply', 'emailtemplates')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'emailtemplates` ADD COLUMN `autoreply` tinyint(1) NOT NULL DEFAULT "0";');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'emailtemplates` ADD COLUMN `autoreply` tinyint(1) NOT NULL DEFAULT "0";');
 }
 
 if (!$CI->db->field_exists('pattern', 'mail_auto_replies')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_auto_replies` ADD COLUMN `pattern` VARCHAR(250) NOT NULL;');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_auto_replies` ADD COLUMN `pattern` VARCHAR(250) NOT NULL;');
 }
 
 if (!$CI->db->field_exists('subject', 'mail_auto_replies')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_auto_replies` ADD COLUMN `subject` LONGTEXT NULL;');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_auto_replies` ADD COLUMN `subject` LONGTEXT NULL;');
 }
 
 if (!$CI->db->field_exists('body', 'mail_auto_replies')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_auto_replies` ADD COLUMN `body` LONGTEXT NULL;');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_auto_replies` ADD COLUMN `body` LONGTEXT NULL;');
 }
 
 if (!$CI->db->field_exists('mail_password', 'staff')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'staff`  ADD COLUMN `mail_password` VARCHAR(250) NULL');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'staff`  ADD COLUMN `mail_password` VARCHAR(250) NULL');
 }
 
 if (!$CI->db->field_exists('mail_signature', 'staff')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'staff`  ADD COLUMN `mail_signature` VARCHAR(250) NULL');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'staff`  ADD COLUMN `mail_signature` VARCHAR(250) NULL');
 }
 
 if (!$CI->db->field_exists('last_email_check', 'staff')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'staff`  ADD COLUMN `last_email_check` VARCHAR(50) NULL');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'staff`  ADD COLUMN `last_email_check` VARCHAR(50) NULL');
 }
 
 if (!$CI->db->field_exists('inbox_id', 'mail_conversation')) {
-  $CI->db->query('ALTER TABLE `'.db_prefix().'mail_conversation` ADD COLUMN `inbox_id` int(255) DEFAULT NULL');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_conversation` ADD COLUMN `inbox_id` int(255) DEFAULT NULL');
 }
 
 // Moving necessary dependencies to the correct place for clean installs of v2.7.0+

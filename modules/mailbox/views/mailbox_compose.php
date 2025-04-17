@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<?php echo form_open_multipart($this->uri->uri_string(), ['id'=>'mailbox_compose_form']); ?>
+<?php echo form_open_multipart($this->uri->uri_string(), ['id'=>'mailbox-compose-form']); ?>
 
 <div class="clearfix mtop20"></div>
 <div class="row">
@@ -157,7 +157,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="mailbox_id" value="<?php echo $outbox_id ?>" >
+                        <input type="hidden" name="mailbox_id" value="<?php echo isset($outbox_id) ? $outbox_id : '' ?>" >
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>
@@ -203,7 +203,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="outbox_id" value="<?php echo $outbox_id ?>" >
+                        <input type="hidden" name="outbox_id" value="<?php echo isset($outbox_id) ? $outbox_id : '' ?>" >
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>
@@ -254,7 +254,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="outbox_id" value="<?php echo $outbox_id ?>" >
+                        <input type="hidden" name="outbox_id" value="<?php echo isset($outbox_id) ? $outbox_id : '' ?>" >
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>
@@ -305,7 +305,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="outbox_id" value="<?php echo $outbox_id ?>" >
+                        <input type="hidden" name="outbox_id" value="<?php echo isset($outbox_id) ? $outbox_id : '' ?>" >
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>

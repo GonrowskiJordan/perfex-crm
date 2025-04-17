@@ -13,7 +13,6 @@ class Mailbox_model extends App_Model
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('email_schedule_model');
     }
 
     /**
@@ -24,19 +23,20 @@ class Mailbox_model extends App_Model
      */
     public function add($data, $staff_id, $ob_id = null)
     {
-        $outbox_id                 = '';
-        $outbox                    = [];
-        $outbox['sender_staff_id'] = $staff_id;
-        $outbox['to']              = $data['to'];
-        $outbox['cc']              = $data['cc'];
-        $outbox['sender_name']     = get_staff_full_name($staff_id);
-        $outbox['subject']         = _strip_tags($data['subject']);
-        $outbox['body']            = _strip_tags($data['body']);
-        $outbox['body']            = nl2br_save_html($outbox['body']);
-        $outbox['date_sent']       = date('Y-m-d H:i:s');
-        $outbox['tagid']           = $data['tagid'];
-        $outbox['templateid']      = $data['templateid'];
-        $outbox['scheduled_at']    = to_sql_date($data['scheduled_at'], true);
+        $outbox_id                      = '';
+        $outbox                         = [];
+        $outbox['sender_staff_id']      = $staff_id;
+        $outbox['to']                   = $data['to'];
+        $outbox['cc']                   = $data['cc'];
+        $outbox['sender_name']          = get_staff_full_name($staff_id);
+        $outbox['subject']              = _strip_tags($data['subject']);
+        $outbox['body']                 = _strip_tags($data['body']);
+        $outbox['body']                 = nl2br_save_html($outbox['body']);
+        $outbox['date_sent']            = date('Y-m-d H:i:s');
+        $outbox['tagid']                = $data['tagid'];
+        $outbox['templateid']           = $data['templateid'];
+        $outbox['scheduled_at']         = to_sql_date($data['scheduled_at'], true);
+        $outbox['scheduled_status']     = $data['scheduled_at'] ? "Scheduled" : "";
         if (isset($data['reply_from_id'])) {
             $outbox['reply_from_id'] = $data['reply_from_id'];
         }
@@ -114,34 +114,24 @@ class Mailbox_model extends App_Model
             }
         }
 
-        if ($data['scheduled_at']) {
-            $this->email_schedule_model->create($outbox_id, 'mail_outbox', [
-                'scheduled_at' => to_sql_date($data['scheduled_at'], true),
-                'cc'           => $data['cc'],
-                'contacts'     => $data['to'],
-                'attach_pdf'   => $attachments && count($attachments) ? 1 : 0,
-                'template'     => 'mail_outbox',
-            ]);
-        } else {
-            // Send email
-            if (strlen(get_option('smtp_host')) > 0 && strlen(get_option('smtp_password')) > 0 && strlen(get_option('smtp_username')) > 0) {
-                $ci = &get_instance();
-                $ci->email->initialize();
-                $ci->load->library('email');
-                $ci->email->clear(true);
-                $ci->email->from($inbox['from_email'], $inbox['sender_name']);
-                $ci->email->to(str_replace(';', ',', $data['to']));
-                if (isset($data['cc']) && strlen($data['cc']) > 0) {
-                    $ci->email->cc($data['cc']);
-                }
-                $ci->email->subject($inbox['subject']);
-                $ci->email->message($data['body']);
-                foreach ($attachments as $attachment) {
-                    $attachment_url = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$outbox_id.'/'.$attachment['file_name'];
-                    $ci->email->attach($attachment_url);
-                }
-                $ci->email->send(true);
+        // Send email
+        if (strlen(get_option('smtp_host')) > 0 && strlen(get_option('smtp_password')) > 0 && strlen(get_option('smtp_username')) > 0) {
+            $ci = &get_instance();
+            $ci->email->initialize();
+            $ci->load->library('email');
+            $ci->email->clear(true);
+            $ci->email->from($inbox['from_email'], $inbox['sender_name']);
+            $ci->email->to(str_replace(';', ',', $data['to']));
+            if (isset($data['cc']) && strlen($data['cc']) > 0) {
+                $ci->email->cc($data['cc']);
             }
+            $ci->email->subject($inbox['subject']);
+            $ci->email->message($data['body']);
+            foreach ($attachments as $attachment) {
+                $attachment_url = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$outbox_id.'/'.$attachment['file_name'];
+                $ci->email->attach($attachment_url);
+            }
+            $ci->email->send(true);
         }
 
         return true;
