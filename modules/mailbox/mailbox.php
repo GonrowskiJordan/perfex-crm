@@ -368,57 +368,6 @@ function scan_email_server()
                 }
             }
         }
-        
-        if (count($inbox_email_ids)) {
-            $CI->db->select()->from(db_prefix() . 'mail_inbox')->where_in('id', $inbox_email_ids);
-            $inbox_mails = $CI->db->get()->result_array();
-            foreach ($inbox_mails as $inbox_mail) {
-                if ($inbox_mail['from_staff_id']) {
-                    $mail_inbox_auto_reply = null;
-                    foreach ($mail_auto_replies as $mail_auto_reply) {
-                        if (preg_match("/" . $mail_auto_reply['pattern'] . "/i", $inbox_mail['subject'])
-                            || preg_match("/" . $mail_auto_reply['pattern'] . "/i", $inbox_mail['body'])) {
-                            $mail_inbox_auto_reply = $mail_auto_reply;
-                        }
-                    }
-                    if ($mail_inbox_auto_reply) {
-                        $CI->email->initialize();
-                        $CI->load->library('email');
-                        $CI->email->clear(true);
-                        
-                        $CI->db->select()->from(db_prefix() . 'staff')->where(db_prefix() . 'staff.staffid', $inbox_mail['from_staff_id']);
-                        $from_staff = $CI->db->get()->row();
-
-                        $CI->db->select()->from(db_prefix() . 'staff')->where(db_prefix() . 'staff.staffid', $inbox_mail['to_staff_id']);
-                        $to_staff = $CI->db->get()->row();
-
-                        $CI->email->from($to_staff->email, get_staff_full_name($inbox_mail['to_staff_id']));
-                        $CI->email->to(str_replace(';', ',', $from_staff->email));
-                        if ($mail_inbox_auto_reply['replyid']) {
-                            $CI->db->select()->from(db_prefix() . 'emailtemplates')->where(db_prefix() . 'emailtemplates.emailtemplateid', $mail_inbox_auto_reply['replyid']);
-                            $auto_reply_emailtemplate = $CI->db->get()->row();
-
-                            $CI->email->subject($auto_reply_emailtemplate->subject);
-                            $CI->email->message($auto_reply_emailtemplate->message);
-                        } else {
-                            $CI->email->subject($mail_inbox_auto_reply['subject']);
-                            $CI->email->message($mail_inbox_auto_reply['body']);
-                        }
-                        $inobx_attach_dir = module_dir_url(MAILBOX_MODULE).'uploads/inbox/'.$in_id;
-                        if (file_exists($inobx_attach_dir)) {
-                            $inobx_files = scandir($inobx_attach_dir);
-                            $inobx_files = array_diff($inobx_files, array(".", ".."));
-                            foreach ($inobx_files as $inobx_file) {
-                                $CI->email->attach($inobx_attach_dir.'/'.$inobx_file);
-                            }
-                        }
-                        $CI->email->send(true);
-                        
-                        log_activity('Auto Reply Email Sent - Name: ' . $mail_inbox_auto_reply['name'] . ' To: ' . $from_staff->email);
-                    }
-                }
-            }
-        }
     }
 
     return false;
@@ -455,7 +404,7 @@ function send_schedule_emails()
         }
         $CI->email->send(true);
 
-        $outbox['scheduled_status'] = "Sent";
+        $scheduled_outbox['scheduled_status'] = "Sent";
         $CI->db->where('id', $scheduled_outbox['id']);
         $CI->db->update(db_prefix().'mail_outbox', $scheduled_outbox);
 

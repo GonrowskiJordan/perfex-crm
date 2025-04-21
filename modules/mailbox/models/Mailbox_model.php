@@ -127,11 +127,58 @@ class Mailbox_model extends App_Model
             }
             $ci->email->subject($inbox['subject']);
             $ci->email->message($data['body']);
-            foreach ($attachments as $attachment) {
-                $attachment_url = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$outbox_id.'/'.$attachment['file_name'];
-                $ci->email->attach($attachment_url);
+            if (isset($attachments) && count($attachments)) {
+                foreach ($attachments as $attachment) {
+                    $attachment_url = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$outbox_id.'/'.$attachment['file_name'];
+                    $ci->email->attach($attachment_url);
+                }
             }
             $ci->email->send(true);
+        
+            // Auto Reply
+            $ci->db->select()->from(db_prefix() . 'mail_auto_replies')->where(db_prefix() . 'mail_auto_replies.active', true);
+            $mail_auto_replies = $ci->db->get()->result_array();
+
+            $mail_inbox_auto_reply = null;
+            foreach ($mail_auto_replies as $mail_auto_reply) {
+                if (preg_match("/" . $mail_auto_reply['pattern'] . "/i", $inbox['subject'])
+                    || preg_match("/" . $mail_auto_reply['pattern'] . "/i", $data['body'])) {
+                    $mail_inbox_auto_reply = $mail_auto_reply;
+                }
+            }
+            if ($mail_inbox_auto_reply) {
+                $ci->email->initialize();
+                
+                $ci->db->select()->from(db_prefix() . 'staff')->where(db_prefix() . 'staff.staffid', $inbox['from_staff_id']);
+                $from_staff = $ci->db->get()->row();
+
+                foreach ($array_send_to as $value) {
+                    $to = get_staff_id_by_email(trim($value));
+                    if ($to > 0) {
+                        $ci->load->library('email');
+                        $ci->email->clear(true);
+
+                        $ci->db->select()->from(db_prefix() . 'staff')->where(db_prefix() . 'staff.staffid', $to);
+                        $to_staff = $ci->db->get()->row();
+
+                        $ci->email->from($to_staff->email, get_staff_full_name($to));
+                        $ci->email->to(str_replace(';', ',', $from_staff->email));
+                        if ($mail_inbox_auto_reply['replyid']) {
+                            $ci->db->select()->from(db_prefix() . 'emailtemplates')->where(db_prefix() . 'emailtemplates.emailtemplateid', $mail_inbox_auto_reply['replyid']);
+                            $auto_reply_emailtemplate = $ci->db->get()->row();
+        
+                            $ci->email->subject($auto_reply_emailtemplate->subject);
+                            $ci->email->message($auto_reply_emailtemplate->message);
+                        } else {
+                            $ci->email->subject($mail_inbox_auto_reply['subject']);
+                            $ci->email->message($mail_inbox_auto_reply['body']);
+                        }
+                        $ci->email->send(true);
+                        
+                        log_activity('Auto Reply Email Sent - Name: ' . $mail_inbox_auto_reply['name'] . ' To: ' . $from_staff->email);
+                    }
+                }
+            }
         }
 
         return true;

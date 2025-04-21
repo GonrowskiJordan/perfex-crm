@@ -594,9 +594,9 @@ class Mailbox extends AdminController
         $this->load->view('email_templates/index', $data);
     }
 
-    public function get_email_template($email_template_id = '') {      
+    public function get_email_template($email_template_id = '') {    
         if ($this->input->is_ajax_request())
-        {  
+        {
             $email_template = $this->emails_model->get_email_template_by_id($email_template_id);
             echo json_encode($email_template);
             exit;
@@ -804,6 +804,7 @@ class Mailbox extends AdminController
 		$data['email_templates'] = $this->emails_model->get([
             'language' => 'english',
             'active' => true,
+            'type' => 'mailbox',
         ]);
         
 		$data['title'] = $title;
