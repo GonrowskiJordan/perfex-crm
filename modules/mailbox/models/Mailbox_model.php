@@ -843,6 +843,35 @@ class Mailbox_model extends App_Model
         return false;
     }
 
+    /**
+     * Delete Auto Reply
+     * @param  mixed $id        auto reply id
+     * @return object
+     */
+    public function delete_auto_reply($id)
+    {
+        hooks()->do_action('before_mailbox_auto_reply_deleted', $id);
+        $last_activity = get_last_system_activity_id();
+
+        $affectedRows = 0;
+        $this->db->where('id', $id);
+        $this->db->delete(db_prefix() . 'mail_auto_replies');
+        if ($this->db->affected_rows() > 0) {
+            $affectedRows++;
+        }
+        if ($affectedRows > 0) {
+            hooks()->do_action('after_mailbox_auto_reply_deleted', $id);
+            // Delete activity log caused by delete customer function
+            if ($last_activity) {
+                $this->db->where('id >', $last_activity->id);
+                $this->db->delete(db_prefix() . 'activity_log');
+            }
+            log_activity('Email Auto Reply Deleted [ID: ' . $id . ']');
+        }
+
+        return $affectedRows ? true : false;
+    }
+
     public function assign_customers($data) {
         foreach($data['select_customers'] as $value) {
             $customer_mail = [];
