@@ -127,7 +127,7 @@ class Mailbox_model extends App_Model
             }
             $ci->email->subject($inbox['subject']);
             $ci->email->message($data['body']);
-            if (isset($attachments) && count($attachments)) {
+            if (isset($attachments) && $attachments && count($attachments)) {
                 foreach ($attachments as $attachment) {
                     $attachment_url = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$outbox_id.'/'.$attachment['file_name'];
                     $ci->email->attach($attachment_url);

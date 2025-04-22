@@ -7,6 +7,7 @@ $aColumns = [
     db_prefix() . 'mail_auto_replies.pattern',
     db_prefix() . 'mail_auto_replies.subject',
     'reply_templates.name as reply_name',
+    db_prefix() . 'mail_auto_replies.body',
     db_prefix() . 'mail_auto_replies.active',
 ];
 
@@ -22,6 +23,7 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_auto_replies.name',
     db_prefix() . 'mail_auto_replies.pattern',
     db_prefix() . 'mail_auto_replies.subject',
+    db_prefix() . 'mail_auto_replies.body',
     db_prefix() . 'mail_auto_replies.active'
 ]);
 
@@ -38,9 +40,9 @@ foreach ($rResult as $aRow) {
     $nameRow .= '</div>';
     $row[] = $nameRow;
     
-    $row[] = '<span>'.$aRow['pattern'].'</span>';
-    $row[] = '<span>'.$aRow['subject'].'</span>';
-    $row[] = '<span>'.$aRow['reply_name'].'</span>';
+    $row[] = '<span>' . $aRow['pattern'] . '</span>';
+    $row[] = '<span>' . $aRow['subject'] . '</span>';
+    $row[] = '<span>'. ($aRow['reply_name'] ? $aRow['reply_name'] : $aRow['body']) .'</span>';
     
     $outputActive = '<div class="onoffswitch">
         <input type="checkbox"' . ' data-switch-url="' . admin_url() . 'mailbox/change_auto_reply_status" name="onoffswitch" class="onoffswitch-checkbox" id="t_' . $aRow['id'] . '" data-id="' . $aRow['id'] . '"' . ($aRow['active'] == 1 ? ' checked' : '') . '>

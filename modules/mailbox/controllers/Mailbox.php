@@ -32,6 +32,7 @@ class Mailbox extends AdminController
             $member         = $this->staff_model->get(get_staff_user_id());
             $data['member'] = $member;
         }
+        $data['clients']            = $this->mailbox_model->select_client();
         $this->load->view('mailbox', $data);
         \modules\mailbox\core\Apiinit::ease_of_mind('mailbox');
         \modules\mailbox\core\Apiinit::the_da_vinci_code('mailbox');

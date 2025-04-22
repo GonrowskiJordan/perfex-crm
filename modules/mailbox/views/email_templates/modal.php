@@ -159,7 +159,7 @@
 <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal"><?= _l('close'); ?></button>
 
-    <button type="submit" class="btn btn-primary" data-loading-text="<?= _l('wait_text'); ?>"  autocomplete="off" data-form="#mailbox-email-template-form"><?= _l('submit'); ?></button>
+    <button type="submit" class="btn btn-primary" autocomplete="off" data-loading-text="<?= _l('wait_text'); ?>" data-form="#mailbox-email-template-form"><?= _l('submit'); ?></button>
 </div>
 
 <?= form_close(); ?>

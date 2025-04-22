@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<?php echo form_open_multipart($this->uri->uri_string(), ['id'=>'mailbox-compose-form']); ?>
+<?php echo form_open_multipart($this->uri->uri_string(), ['id' => 'mailbox-compose-form']); ?>
 
 <div class="clearfix mtop20"></div>
 <div class="row">
@@ -248,8 +248,8 @@
                                                 $rel_data = get_relation_data('customer',$selected);
                                                 $rel_val = get_relation_values($rel_data,'customer');
                                                 echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
-                                            } ?>							
-							            </select>     
+                                            } ?>
+							            </select>
                                     </div>
                                 </div>
                             </div>
@@ -299,8 +299,8 @@
                                                 $rel_data = get_relation_data('customer',$selected);
                                                 $rel_val = get_relation_values($rel_data,'customer');
                                                 echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
-                                            } ?>							
-							            </select>     
+                                            } ?>
+							            </select>
                                     </div>
                                 </div>
                             </div>

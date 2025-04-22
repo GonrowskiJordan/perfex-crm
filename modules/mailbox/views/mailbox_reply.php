@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<?php echo form_open_multipart($this->uri->uri_string(), ['id'=>'mailbox-compose-form']); ?>
+<?php echo form_open_multipart($this->uri->uri_string(), ['id' => 'mailbox-compose-form']); ?>
 
 <div class="clearfix mtop20"></div>
 <div class="row">
@@ -14,9 +14,9 @@
                 if ('reply' == $method) {
                     $subject = 'RE: '.$mail->subject;
                     $from_email = $mail->from_email;
-                    //$split = explode(' <', $from_email);
-                    //$name = $split[0];
-                    //$from_email = rtrim($split[1], '>');
+                    // $split = explode(' <', $from_email);
+                    // $name = $split[0];
+                    // $from_email = rtrim($split[1], '>');
                     $to      = $from_email;
                 } else if ('replyall' == $method) {
                     $subject = 'RE: '.$mail->subject;
@@ -56,6 +56,19 @@
         </div>
         <?php echo render_input('cc', 'CC'); ?>
         <?php echo render_input('subject', 'mailbox_subject', $subject); ?>
+
+        <div class="form-group select-placeholder">
+            <label for="templateid" class="control-label"><?= _l('email_template'); ?></label>
+            <select name="templateid" data-live-search="true" id="templateid" class="form-control selectpicker" data-none-selected-text="<?= _l('dropdown_non_selected_tex'); ?>">
+                <option></option>
+                <?php foreach ($email_templates as $email_template) { ?>
+                    <option value="<?= $email_template['emailtemplateid']; ?>" <?= isset($mail) && $mail->templateid == $email_template['emailtemplateid'] ? 'selected' : ''; ?>>
+                        <?= e($email_template['name']); ?>
+                    </option>
+                <?php } ?>
+            </select>
+        </div>
+        
         <?php
             $CI = &get_instance();
             $CI->db->select()->from(db_prefix().'staff')->where(db_prefix().'staff.mail_password !=', '');
@@ -70,16 +83,16 @@
         <?php 
         if (!empty($attachment)) {
             if (!empty($mail_signature)) {
-                echo render_textarea('body', '', '<br><br>---'.$body.'<br>'.$attachmentlang.': <a href="'.$attachment.'">'.$filename.'</a><br><br>'.$mail_signature, [], [], '', 'tinymce tinymce-compose');
+                echo render_textarea('body', '', '<br><br>---'.$body.'<br>'.$attachmentlang.': <a href="'.$attachment.'">'.$filename.'</a><br><br>'.$mail_signature, [], [], '', 'tinymce tinymce-reply');
             } else {
-                echo render_textarea('body', '', '<br><br>---'.$body.'<br>'.$attachmentlang.': <a href="'.$attachment.'">'.$filename.'</a>', [], [], '', 'tinymce tinymce-compose');
+                echo render_textarea('body', '', '<br><br>---'.$body.'<br>'.$attachmentlang.': <a href="'.$attachment.'">'.$filename.'</a>', [], [], '', 'tinymce tinymce-reply');
             }
         }
         if (empty($attachment)) {
             if (!empty($mail_signature)) {
-                echo render_textarea('body', '', '<br><br>---'.$body.'<br>'.$mail_signature, [], [], '', 'tinymce tinymce-compose');
+                echo render_textarea('body', '', '<br><br>---'.$body.'<br>'.$mail_signature, [], [], '', 'tinymce tinymce-reply');
             } else {
-                echo render_textarea('body', '', '<br><br>---'.$body.'<br>', [], [], '', 'tinymce tinymce-compose');
+                echo render_textarea('body', '', '<br><br>---'.$body.'<br>', [], [], '', 'tinymce tinymce-reply');
             }
         }
         ?>  

@@ -228,7 +228,7 @@
         var webmailTableNotSortable = [0];
         initDataTable('.table-mailbox', admin_url + 'mailbox/table/<?php echo $group; ?>', 'undefined', webmailTableNotSortable, 'undefined', [5, 'desc']);
 
-        appValidateForm($('#mailbox_config_form'), {
+        appValidateForm($('#mailbox-config-form'), {
             email: 'required',
             mail_password: 'required',
         });

@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<?php echo form_open_multipart($this->uri->uri_string().'/config', ['id'=>'mailbox_config_form']); ?>
+<?php echo form_open_multipart($this->uri->uri_string().'/config', ['id'=>'mailbox-config-form']); ?>
 
 <div class="row">
     <div class="col-lg-12">

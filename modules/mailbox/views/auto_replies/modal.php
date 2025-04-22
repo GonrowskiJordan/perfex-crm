@@ -2,7 +2,7 @@
 
 <!-- Modal Auto Reply -->
 
-<?= form_open(admin_url('mailbox/form_auto_reply/' . ($auto_reply_id ? $auto_reply_id : '')), ['id' => 'mailbox-auto-reply-form', 'autocomplete' => 'off']); ?>
+<?= form_open(admin_url('mailbox/form_auto_reply/' . ($auto_reply_id ? $auto_reply_id : '')), ['id' => 'mailbox-auto-reply-form']); ?>
 
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -40,7 +40,7 @@
 
             <?php echo render_input('subject', 'mailbox_subject', (isset($auto_reply) ? $auto_reply->subject : '')); ?>
 
-            <?php echo render_textarea('body', 'mailbox_body', (isset($auto_reply) ? $auto_reply->body : ''), [], [], '', 'tinymce tinymce-compose'); ?>
+            <?php echo render_textarea('body', 'mailbox_body', (isset($auto_reply) ? $auto_reply->body : ''), [], [], '', 'tinymce tinymce-auto-reply'); ?>
 
             <?php $rel_id = (isset($auto_reply) ? $auto_reply->id : false); ?>
             <?= render_custom_fields('maibox_auto_replies', $rel_id); ?>
@@ -63,7 +63,7 @@
 <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal"><?= _l('close'); ?></button>
 
-    <button type="submit" class="btn btn-primary" data-loading-text="<?= _l('wait_text'); ?>"  autocomplete="off" data-form="#mailbox-auto-reply-form"><?= _l('submit'); ?></button>
+    <button type="submit" class="btn btn-primary" autocomplete="off" data-loading-text="<?= _l('wait_text'); ?>" data-form="#mailbox-auto-reply-form"><?= _l('submit'); ?></button>
 </div>
 
 <?= form_close(); ?>

@@ -226,7 +226,7 @@ function scan_email_server()
 
                 foreach ($emails as $email) {
                     $bodyData = $imap->getBody($email['uid']);
-                    $email['body'] = trim($bodyData['body']);
+                    $email['body'] = $bodyData['body'] ? trim($bodyData['body']) : null;
 
                     if ($bodyData['html']) {
                         $email['body'] = prepare_imap_email_body_html($email['body']);

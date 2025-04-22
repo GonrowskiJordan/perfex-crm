@@ -125,8 +125,6 @@ function view_contact(contact_id) {
             backdrop: 'static'
         });
 
-        $('body').off('shown.bs.modal', '#contact');
-
         $('body').on('shown.bs.modal', '#contact', function() {
             if (contact_id == '') {
                 $('#contact').find('input[name="firstname"]').focus();
@@ -191,8 +189,6 @@ function view_mailbox_tag(tag_id) {
             show: true,
             backdrop: 'static'
         });
-
-        $('body').off('shown.bs.modal', '#mailbox-tag-form');
 
         $('body').on('shown.bs.modal', '#mailbox-tag-form', function() {
             if (tag_id == '') {
@@ -259,8 +255,6 @@ function view_mailbox_email_template(template_id) {
             backdrop: 'static'
         });
 
-        $('body').off('shown.bs.modal', '#mailbox-email-template-form');
-
         $('body').on('shown.bs.modal', '#mailbox-email-template-form', function() {
             if (template_id == '') {
                 $('#mailbox-email-template-form').find('input[name="name"]').focus();
@@ -279,49 +273,6 @@ function view_mailbox_email_template(template_id) {
     });
 }
 
-function init_tinymce_editor(selector, content = '') {
-    tinymce.remove(selector);
-    if (!content) {
-        content = $(selector).val();
-    }
-    $(selector).val(content);
-    tinymce.init({
-        branding: false,
-        promotion: false,
-        selector: selector,
-        browser_spellcheck: true,
-        cache_suffix: '?v=' + app.version,
-        height: 250,
-        min_height: 250,
-        statusbar: false,
-        theme: "silver",
-        paste_block_drop: true,
-        language: app.tinymce_lang || 'en',
-        relative_urls: false,
-        entity_encoding: "raw",
-        autoresize_bottom_margin: 25,
-        valid_elements: "+*[*]",
-        valid_children: "+body[style], +style[type]",
-        remove_script_host: false,
-        removed_menuitems: "newdocument restoredraft",
-        forced_root_block: "p",
-        autosave_restore_when_empty: false,
-        font_size_formats: "8pt 10pt 12pt 14pt 18pt 24pt 36pt",
-        table_default_styles: {
-          width: "100%",
-        },
-        plugins: ["advlist", "autoresize", "autosave", "lists", "link", "image", "codesample", "visualblocks", "code", "fullscreen", "media", "save", "table", ],
-        toolbar: "fontfamily fontsize | forecolor backcolor | bold italic | alignleft aligncenter alignright alignjustify | image link | bullist numlist | restoredraft",
-        contextmenu: "link image | paste copy",
-        file_picker_callback: elFinderBrowser,
-        setup: function(editor) {
-            editor.on('init', function() {
-                editor.setContent(content);
-            });
-        }
-    });
-}
-
 function check_email_template() {
     let mailbox_templateid = $('#mailbox-compose-form [name="templateid"]').val() ? $('#mailbox-compose-form [name="templateid"]').val() : '';
     if (mailbox_templateid) {
@@ -330,13 +281,11 @@ function check_email_template() {
             url: admin_url + '/mailbox/get_email_template/' + mailbox_templateid,
         }).done(function(response) {
             response = JSON.parse(response);
-
-            init_tinymce_editor('#mailbox-compose-form [name="body"]', response.message);
+            
+            tinymce.get('body').setContent(response.message);
         }).fail(function(error) {
             alert_float('danger', JSON.parse(error.responseText));
         });
-    } else {
-        init_tinymce_editor('#mailbox-compose-form [name="body"]');
     }
 }
 
@@ -344,7 +293,8 @@ $('#mailbox-compose-form [name="templateid"]').change(function() {
     check_email_template();
 });
 
-function check_reply_template() {
+
+function check_auto_reply_template() {
     let mailbox_templateid = $('#mailbox-auto-reply-form [name="replyid"]').val() ? $('#mailbox-auto-reply-form [name="replyid"]').val() : '';
     if (mailbox_templateid) {
         $.ajax({
@@ -352,13 +302,11 @@ function check_reply_template() {
             url: admin_url + '/mailbox/get_email_template/' + mailbox_templateid,
         }).done(function(response) {
             response = JSON.parse(response);
-
-            init_tinymce_editor('#mailbox-auto-reply-form [name="body"]', response.message);
+            
+            tinymce.get('body').setContent(response.message);
         }).fail(function(error) {
             alert_float('danger', JSON.parse(error.responseText));
         });
-    } else {
-        init_tinymce_editor('#mailbox-auto-reply-form [name="body"]');
     }
 }
 
@@ -366,7 +314,8 @@ function mailboxAutoReplyFormHandler(form) {
     var formURL = $(form).attr("action");
 
     var formData = new FormData($(form)[0]);
-
+    formData.set("body", tinymce.get('body').getContent());
+    
     $.ajax({
         type: 'POST',
         data: formData,
@@ -411,8 +360,6 @@ function view_mailbox_auto_reply(auto_reply_id) {
             backdrop: 'static'
         });
 
-        $('body').off('shown.bs.modal', '#mailbox-auto-reply-form');
-
         $('body').on('shown.bs.modal', '#mailbox-auto-reply-form', function() {
             if (auto_reply_id == '') {
                 $('#mailbox-auto-reply-form').find('input[name="name"]').focus();
@@ -423,11 +370,12 @@ function view_mailbox_auto_reply(auto_reply_id) {
         init_datepicker();
         custom_fields_hyperlink();
         validate_mailbox_auto_reply_form();
+        init_editor('#mailbox-auto-reply-form [name="body"]');
 
         $('#mailbox-auto-reply-form [name="replyid"]').change(function() {
-            check_reply_template();
+            check_auto_reply_template();
         });
-        check_reply_template();
+        check_auto_reply_template();
     }).fail(function(error) {
         var response = JSON.parse(error.responseText);
 
