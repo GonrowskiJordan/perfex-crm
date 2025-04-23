@@ -42,7 +42,7 @@ foreach ($rResult as $aRow) {
     
     $row[] = '<span>' . $aRow['pattern'] . '</span>';
     $row[] = '<span>' . $aRow['subject'] . '</span>';
-    $row[] = '<span>'. ($aRow['reply_name'] ? $aRow['reply_name'] : $aRow['body']) .'</span>';
+    $row[] = '<span>'. ($aRow['reply_name'] ? $aRow['reply_name'] : substr($aRow['body'], 0, 30)) .'</span>';
     
     $outputActive = '<div class="onoffswitch">
         <input type="checkbox"' . ' data-switch-url="' . admin_url() . 'mailbox/change_auto_reply_status" name="onoffswitch" class="onoffswitch-checkbox" id="t_' . $aRow['id'] . '" data-id="' . $aRow['id'] . '"' . ($aRow['active'] == 1 ? ' checked' : '') . '>

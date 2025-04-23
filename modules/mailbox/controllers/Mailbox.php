@@ -52,7 +52,7 @@ class Mailbox extends AdminController
         $data['group'] = $group;
         if ($this->input->post()) {
             $data            = $this->input->post();
-			$data['body']    = $this->input->post('body', false);
+			$data['body']    = htmlspecialchars($this->input->post('body', false));
             $id              = $this->mailbox_model->add($data, get_staff_user_id(), $outbox_id);
             if ($id) {
                 if ('draft' == $this->input->post('sendmail')) {
@@ -765,7 +765,7 @@ class Mailbox extends AdminController
 		if ($this->input->post())
 		{
 			$data = $this->input->post();
-			$data['body'] = $this->input->post('body', false);
+			$data['body'] = htmlspecialchars($this->input->post('body', false));
             if (isset($data['active'])) {
                 $data['active'] = 1;
             } else {
