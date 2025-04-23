@@ -2,7 +2,7 @@
 
 <!-- Modal Auto Reply -->
 
-<?= form_open(admin_url('mailbox/form_auto_reply/' . ($auto_reply_id ? $auto_reply_id : '')), ['id' => 'mailbox-auto-reply-form']); ?>
+<?= form_open_multipart(admin_url('mailbox/form_auto_reply/' . ($auto_reply_id ? $auto_reply_id : '')), ['id' => 'mailbox-auto-reply-form']); ?>
 
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
