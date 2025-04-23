@@ -293,7 +293,6 @@ $('#mailbox-compose-form [name="templateid"]').change(function() {
     check_email_template();
 });
 
-
 function check_auto_reply_template() {
     let mailbox_templateid = $('#mailbox-auto-reply-form [name="replyid"]').val() ? $('#mailbox-auto-reply-form [name="replyid"]').val() : '';
     if (mailbox_templateid) {
@@ -315,7 +314,7 @@ function mailboxAutoReplyFormHandler(form) {
 
     var formData = new FormData($(form)[0]);
     formData.set("body", tinymce.get('body').getContent());
-    
+
     $.ajax({
         type: 'POST',
         data: formData,
@@ -370,6 +369,7 @@ function view_mailbox_auto_reply(auto_reply_id) {
         init_datepicker();
         custom_fields_hyperlink();
         validate_mailbox_auto_reply_form();
+        tinymce.remove('#mailbox-auto-reply-form [name="body"]');
         init_editor('#mailbox-auto-reply-form [name="body"]');
 
         $('#mailbox-auto-reply-form [name="replyid"]').change(function() {
