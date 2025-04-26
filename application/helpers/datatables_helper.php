@@ -253,6 +253,7 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     {$sLimit}
     ";
 
+    // echo $resultQuery; die;
     $rResult = hooks()->apply_filters(
         'datatables_sql_query_results',
         $CI->db->query($resultQuery)->result_array(),

@@ -146,7 +146,7 @@
                                 <div class="form-group">
                                     <div id="customers">
                                         <?php
-                                            $selected = [];
+                                            $selected = mailbox_get_client_companies(isset($outbox_id) ? $outbox_id : '', 'outbox', false);
                                             if (is_admin()) {
                                                 echo render_select_with_input_group('select_customers[]', $clients, ['userid', 'company'], 'select_customers', $selected, '<div class="input-group-btn"><a href="#" class="btn btn-default" data-toggle="modal" data-target="#customer_group_modal"><i class="fa fa-plus"></i></a></div>', ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
                                             } else {
@@ -245,7 +245,7 @@
                                             }
 
                                             if ($selected != '') {
-                                                $rel_data = get_relation_data('customer',$selected);
+                                                $rel_data = get_relation_data('customer', $selected);
                                                 $rel_val = get_relation_values($rel_data,'customer');
                                                 echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
                                             } ?>
@@ -296,7 +296,7 @@
                                             }
 
                                             if ($selected != '') {
-                                                $rel_data = get_relation_data('customer',$selected);
+                                                $rel_data = get_relation_data('customer', $selected);
                                                 $rel_val = get_relation_values($rel_data,'customer');
                                                 echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
                                             } ?>

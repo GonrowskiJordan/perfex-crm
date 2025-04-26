@@ -239,5 +239,29 @@ function get_mail_templates($active = true)
         $CI->db->where('active', false);
     }
 
-    return  $CI->db->get(db_prefix().'emailtemplates')->result_array();
+    return $CI->db->get(db_prefix().'emailtemplates')->result_array();
+}
+
+function mailbox_get_client_companies($mailbox_id, $type = 'inbox', $is_string = true) {
+    $client_compaies = [];
+    $client_ids = [];
+    $CI = &get_instance();
+    $CI->db->where($type . '_id', $mailbox_id);
+    $mail_clients = $CI->db->get(db_prefix().'mail_clients')->result_array();
+    foreach ($mail_clients as $mail_client) {
+        $CI->db->where('userid', $mail_client['client_id']);
+        $client = $CI->db->get(db_prefix().'clients')->row();
+        if ($client) {
+            if (!in_array($client->company, $client_compaies)) {
+                $client_compaies[] = $client->company;
+            }
+            if (!in_array($client->userid, $client_ids)) {
+                $client_ids[] = $client->userid;
+            }
+        }
+    }
+    if ($is_string) {
+        return implode(", ", $client_compaies);
+    }
+    return $client_ids;
 }

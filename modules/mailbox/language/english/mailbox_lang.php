@@ -83,6 +83,7 @@ $lang['edit_mailbox_auto_reply']										= 'Edit Auto Reply';
 $lang['mailbox_receive_template']										= 'Receive Template';
 $lang['mailbox_reply_template']										    = 'Reply Template';
 $lang['assign_customers']											    = 'Assign Customers';
+$lang['assigned_customers']											    = 'Assigned Customers';
 $lang['assign_to_customers']											= 'Assign to Customers';
 $lang['select_customers']												= 'Select Customers';
 $lang['customers_assign_successfully']									= 'Customers Assigned Successfully';

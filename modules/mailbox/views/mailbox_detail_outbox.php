@@ -92,7 +92,7 @@
                                 <div class="form-group">
                                     <div id="customers">
                                         <?php
-                                            $selected = [];
+                                            $selected = mailbox_get_client_companies($mailbox_id, 'outbox', false);
                                             if (is_admin()) {
                                                 echo render_select_with_input_group('select_customers[]', $clients, ['userid', 'company'], 'select_customers', $selected, '<div class="input-group-btn"><a href="#" class="btn btn-default" data-toggle="modal" data-target="#customer_group_modal"><i class="fa fa-plus"></i></a></div>', ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
                                             } else {

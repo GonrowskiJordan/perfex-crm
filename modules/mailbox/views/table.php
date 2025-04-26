@@ -8,7 +8,8 @@ $aColumns = [
     db_prefix() . 'mail_inbox.subject',
     db_prefix() . 'mail_tags.name as tag_name',
     db_prefix() . 'emailtemplates.name as template_name',
-    db_prefix() . 'mail_inbox.date_received',
+    db_prefix() . 'mail_inbox.assigned_clients',
+    db_prefix() . 'mail_inbox.date_received'
 ];
 
 $sIndexColumn = 'id';
@@ -29,17 +30,18 @@ if ($group == 'inbox') {
 } else if ($group == 'trash') {
     array_push($where, ' AND trash = 1');
 }
+$group_by = ' GROUP BY ' . db_prefix() . 'mail_inbox.id';
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_inbox.id',
-    db_prefix() . 'mail_inbox.has_attachment',
     db_prefix() . 'mail_inbox.stared',
     db_prefix() . 'mail_inbox.important',
+    db_prefix() . 'mail_inbox.has_attachment',
     db_prefix() . 'mail_inbox.sender_name',
     db_prefix() . 'mail_inbox.subject',
-    db_prefix() . 'mail_inbox.body',
     db_prefix() . 'mail_inbox.read',
+    db_prefix() . 'mail_inbox.assigned_clients',
     db_prefix() . 'mail_inbox.date_received'
-]);
+], $group_by);
 
 $output  = $result['output'];
 $rResult = $result['rResult'];
@@ -77,7 +79,8 @@ foreach ($rResult as $aRow) {
     $row[] = $content.'<span class="'.$read.'">'.$aRow['sender_name'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].($has_attachment ? ' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment : '').'</a>';
     $row[] = $content.'<span>'.$aRow['tag_name'].'</span></a>';
-    $row[] = $content.'<span>'._dt($aRow['template_name']).'</span></a>';
+    $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
+    $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'._dt($aRow['date_received']).'</span></a>';
 
     $output['aaData'][] = $row;

@@ -83,6 +83,7 @@ $lang['delete_mailbox_auto_reply']										= 'Видалити авто-від�
 $lang['mailbox_receive_template']										= 'Шаблон отримання';
 $lang['mailbox_reply_template']										    = 'Шаблон відповіді';
 $lang['assign_customers']											    = 'Призначити клієнтів';
+$lang['assigned_customers']											    = 'Призначені клієнти';
 $lang['assign_to_customers']											= 'AПризначити клієнтам';
 $lang['select_customers']												= 'Вибрати клієнтів';
 $lang['customers_assign_successfully']									= 'Успішно призначені клієнти';

@@ -45,17 +45,17 @@ class Mailbox_model extends App_Model
         }
         if (isset($data['sendmail']) && 'draft' == $data['sendmail']) {
             $outbox['draft']      =  1;
-            $this->db->insert(db_prefix().'mail_outbox', $outbox);
+            $this->db->insert(db_prefix() . 'mail_outbox', $outbox);
 
             return true;
         }
         if (isset($ob_id)) {
             $outbox['draft'] = 0;
             $this->db->where('id', $ob_id);
-            $this->db->update(db_prefix().'mail_outbox', $outbox);
+            $this->db->update(db_prefix() . 'mail_outbox', $outbox);
             $outbox_id = $ob_id;
         } else {
-            $this->db->insert(db_prefix().'mail_outbox', $outbox);
+            $this->db->insert(db_prefix() . 'mail_outbox', $outbox);
             $outbox_id = $this->db->insert_id();
         }
         $inbox                       = [];
@@ -92,7 +92,7 @@ class Mailbox_model extends App_Model
             if ($to > 0) {
                 $d_inbox                = $inbox;
                 $d_inbox['to_staff_id'] = $to;
-                $this->db->insert(db_prefix().'mail_inbox', $d_inbox);
+                $this->db->insert(db_prefix() . 'mail_inbox', $d_inbox);
                 $inbox_id         = $this->db->insert_id();
                 $array_inbox_id[] = $inbox_id;
             }
@@ -195,9 +195,9 @@ class Mailbox_model extends App_Model
         foreach ($attachments as $attachment) {
             $attachment['mail_id']  = $mail_id;
             $attachment['type']     = $type;
-            $this->db->insert(db_prefix().'mail_attachment', $attachment);
+            $this->db->insert(db_prefix() . 'mail_attachment', $attachment);
             $this->db->where('id', $mail_id);
-            $this->db->update(db_prefix().'mail_'.$type, [
+            $this->db->update(db_prefix() . 'mail_'.$type, [
                 'has_attachment' => 1,
             ]);
         }
@@ -215,7 +215,7 @@ class Mailbox_model extends App_Model
     {
         $this->db->where('id', $id);
 
-        return $this->db->get(db_prefix().'mail_'.$type)->row();
+        return $this->db->get(db_prefix() . 'mail_'.$type)->row();
     }
 
     /**
@@ -242,10 +242,10 @@ class Mailbox_model extends App_Model
                         $type = 'outbox';
                     }
                     $this->db->where('id', $id);
-                    $this->db->delete(db_prefix().'mail_'.$type);
+                    $this->db->delete(db_prefix() . 'mail_'.$type);
 
                     $this->db->where('mail_id', $id);
-                    $file = $this->db->get(db_prefix().'mail_attachment')->result_array();
+                    $file = $this->db->get(db_prefix() . 'mail_attachment')->result_array();
                     foreach ($file as $f) {
                         $path           = MAILBOX_MODULE_UPLOAD_FOLDER.'/'.$type.'/'.$id.'/'.$f['file_name'];
                         if (file_exists($path)) {
@@ -254,10 +254,10 @@ class Mailbox_model extends App_Model
                     }
                     $this->db->where('mail_id', $id);
                     $this->db->where('type', $type);
-                    $this->db->delete(db_prefix().'mail_attachment');
+                    $this->db->delete(db_prefix() . 'mail_attachment');
                 } else {
                     $this->db->where('id', $id);
-                    $this->db->update(db_prefix().'mail_'.$type, [
+                    $this->db->update(db_prefix() . 'mail_'.$type, [
                         $action => $value,
                     ]);
                 }
@@ -279,7 +279,7 @@ class Mailbox_model extends App_Model
         $this->db->where('mail_id', $mail_id);
         $this->db->where('type', $type);
 
-        return $this->db->get(db_prefix().'mail_attachment')->result_array();
+        return $this->db->get(db_prefix() . 'mail_attachment')->result_array();
     }
 
     /**
@@ -294,7 +294,7 @@ class Mailbox_model extends App_Model
     {
         unset($data['email']);
         $this->db->where('staffid', $staff_id);
-        $this->db->update(db_prefix().'staff', $data);
+        $this->db->update(db_prefix() . 'staff', $data);
 
         return true;
     }
@@ -306,7 +306,7 @@ class Mailbox_model extends App_Model
     public function select_client()
     {
         $this->db->select('*');
-        $data = $this->db->get(db_prefix().'clients')->result_array();
+        $data = $this->db->get(db_prefix() . 'clients')->result_array();
         return $data;
     }
 
@@ -319,7 +319,7 @@ class Mailbox_model extends App_Model
         $this->db->select('*');
         $this->db->where("lost", 0);
         $this->db->where("junk", 0);
-        $data = $this->db->get(db_prefix().'leads')->result_array();
+        $data = $this->db->get(db_prefix() . 'leads')->result_array();
         return $data;
     }
 
@@ -331,9 +331,9 @@ class Mailbox_model extends App_Model
             $this->db->select('*');
             $this->db->where("outbox_id", $data['outbox_id']);
             $this->db->where("lead_id", $value);
-            $select_data = $this->db->get(db_prefix().'mail_conversation')->result_array();
+            $select_data = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
             if (empty($select_data)) {
-               $this->db->insert(db_prefix().'mail_conversation', $lead_mail);
+               $this->db->insert(db_prefix() . 'mail_conversation', $lead_mail);
                $mail_conversation_id = $this->db->insert_id();
             }   
         }
@@ -348,9 +348,9 @@ class Mailbox_model extends App_Model
             $this->db->select('*');
             $this->db->where("inbox_id", $data['inbox_id']);
             $this->db->where("lead_id", $value);
-            $select_data = $this->db->get(db_prefix().'mail_conversation')->result_array();
+            $select_data = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
             if (empty($select_data)) {
-               $this->db->insert(db_prefix().'mail_conversation', $lead_mail);
+               $this->db->insert(db_prefix() . 'mail_conversation', $lead_mail);
                $mail_conversation_id = $this->db->insert_id();
             } 
         }
@@ -374,7 +374,7 @@ class Mailbox_model extends App_Model
     {
         $this->db->select('*');
 		$this->db->where("status", 5);
-        $data = $this->db->get(db_prefix().'tickets')->result_array();
+        $data = $this->db->get(db_prefix() . 'tickets')->result_array();
 
         return $data;
     }
@@ -387,9 +387,9 @@ class Mailbox_model extends App_Model
             $this->db->select('*');
             $this->db->where("outbox_id", $data['outbox_id']);
             $this->db->where("ticket_id", $value);
-            $select_data = $this->db->get(db_prefix().'mail_conversation')->result_array();
+            $select_data = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
             if (empty($select_data)) {
-               $this->db->insert(db_prefix().'mail_conversation', $ticket_mail);
+               $this->db->insert(db_prefix() . 'mail_conversation', $ticket_mail);
                $mail_conversation_id = $this->db->insert_id();
             }   
         }
@@ -408,12 +408,12 @@ class Mailbox_model extends App_Model
 			$ticket_mail['priority'] = 2;
 			$this->db->select('id');
 			$this->db->where('userid', $ticketuserid);
-			$thecontactid = $this->db->get(db_prefix().'contacts')->row();
+			$thecontactid = $this->db->get(db_prefix() . 'contacts')->row();
 			$ticket_mail['contactid'] = $thecontactid->id;
 			$ticket_mail['userid'] = $ticketuserid;
 			$ticket_mail['date'] = date("Y-m-d H:i:s");
 			$ticket_mail['assigned'] = 1;
-			$this->db->insert(db_prefix().'tickets', $ticket_mail);
+			$this->db->insert(db_prefix() . 'tickets', $ticket_mail);
 			$ticket_id = $this->db->insert_id();
 		}
 		
@@ -880,11 +880,21 @@ class Mailbox_model extends App_Model
             $this->db->select('*');
             $this->db->where($data['type'] . "_id", $data['mailbox_id']);
             $this->db->where("client_id", $value);
-            $select_data = $this->db->get(db_prefix().'mail_clients')->result_array();
+            $select_data = $this->db->get(db_prefix() . 'mail_clients')->result_array();
             if (empty($select_data)) {
-               $this->db->insert(db_prefix().'mail_clients', $customer_mail);
+               $this->db->insert(db_prefix() . 'mail_clients', $customer_mail);
                $mail_customer_id = $this->db->insert_id();
-            }   
+            }
+
+            $client_companies = mailbox_get_client_companies($data['mailbox_id'], $data['type']);
+            $this->db->where('id', $data['mailbox_id']);
+            $this->db->update(db_prefix() . 'mail_' . $data['type'], [
+                'assigned_clients' => $client_companies,
+            ]);
+            if ($this->db->affected_rows() > 0) {
+                hooks()->do_action('mailbox_assigned_customers', ['id' => $data['mailbox_id'], 'clients' => $client_companies, ]);
+                log_activity('Mailbox Assigned Customers [ID: ' . $data['mailbox_id'] . ' Client Companies: ' . $client_companies . ']');
+            }
         }
         return true;
     }
@@ -892,7 +902,18 @@ class Mailbox_model extends App_Model
     public function unassign_customers($data) {
         $this->db->where($data['type'] . '_id', $data['mail_id']);
         $this->db->where('client_id', $data['client_id']);
-        $this->db->delete(db_prefix().'mail_clients');
+        $this->db->delete(db_prefix() . 'mail_clients');
+
+        $client_companies = mailbox_get_client_companies($data['mail_id'], $data['type']);
+        $this->db->where('id', $data['mail_id']);
+        $this->db->update(db_prefix() . 'mail_' . $data['type'], [
+            'assigned_clients' => $client_companies,
+        ]);
+        if ($this->db->affected_rows() > 0) {
+            hooks()->do_action('mailbox_unassigned_customers', ['id' => $data['mail_id'], 'clients' => $client_companies, ]);
+            log_activity('Mailbox UnAssigned Customers [ID: ' . $data['mail_id'] . ' Client Companies: ' . $client_companies . ']');
+        }
+
         return true;
     }
 }

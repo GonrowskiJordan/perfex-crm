@@ -138,6 +138,14 @@ if (!$CI->db->field_exists('scheduled_status', 'mail_outbox')) {
   $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `scheduled_status` VARCHAR(127)  DEFAULT "";');
 }
 
+if (!$CI->db->field_exists('assigned_clients', 'mail_inbox')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_inbox` ADD COLUMN `assigned_clients` VARCHAR(511)  DEFAULT "";');
+}
+
+if (!$CI->db->field_exists('assigned_clients', 'mail_outbox')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `assigned_clients` VARCHAR(511)  DEFAULT "";');
+}
+
 if (!$CI->db->field_exists('replyid', 'emailtemplates')) {
   $CI->db->query('ALTER TABLE `' . db_prefix() . 'emailtemplates` ADD COLUMN `replyid` int(11);');
 }

@@ -4,21 +4,18 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $aColumns = [
     db_prefix() . 'mail_outbox.to',
-    db_prefix() . 'mail_outbox.sender_name',
     db_prefix() . 'mail_outbox.subject',
-    db_prefix() . 'mail_outbox.date_sent',
-    db_prefix() . 'mail_outbox.scheduled_at',
-    db_prefix() . 'mail_tags.id as tag_id',
     db_prefix() . 'mail_tags.name as tag_name',
-    db_prefix() . 'emailtemplates.emailtemplateid as template_id',
-    db_prefix() . 'emailtemplates.name as template_name'
+    db_prefix() . 'emailtemplates.name as template_name',
+    db_prefix() . 'mail_outbox.assigned_clients',
+    db_prefix() . 'mail_outbox.scheduled_at',
+    db_prefix() . 'mail_outbox.date_sent'
 ];
 
 $sIndexColumn = 'id';
 $sTable       = db_prefix() . 'mail_outbox';
 
 $join = [
-    'LEFT JOIN ' . db_prefix() . 'mail_tags ON ' . db_prefix() . 'mail_tags.id = ' . db_prefix() . 'mail_outbox.tagid',
     'LEFT JOIN ' . db_prefix() . 'emailtemplates ON ' . db_prefix() . 'emailtemplates.emailtemplateid = ' . db_prefix() . 'mail_outbox.templateid',
     'LEFT JOIN ' . db_prefix() . 'mail_clients ON ' . db_prefix() . 'mail_clients.outbox_id = ' . db_prefix() . 'mail_outbox.id',
 ];
@@ -28,15 +25,17 @@ array_push($where, ' AND draft = 0');
 if ($client_id) {
     array_push($where, ' AND ' . db_prefix() . 'mail_clients.client_id = ' . $client_id);
 }
+$group_by = ' GROUP BY ' . db_prefix() . 'mail_outbox.id';
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_outbox.id',
-    db_prefix() . 'mail_outbox.has_attachment',
     db_prefix() . 'mail_outbox.stared',
     db_prefix() . 'mail_outbox.important',
+    db_prefix() . 'mail_outbox.has_attachment',
+    db_prefix() . 'mail_outbox.to',
     db_prefix() . 'mail_outbox.subject',
-    db_prefix() . 'mail_outbox.body',
-    db_prefix() . 'mail_outbox.date_sent',
-    db_prefix() . 'mail_outbox.scheduled_at'
+    db_prefix() . 'mail_outbox.assigned_clients',
+    db_prefix() . 'mail_outbox.scheduled_at',
+    db_prefix() . 'mail_outbox.date_sent'
 ]);
 
 $output  = $result['output'];
@@ -69,6 +68,7 @@ foreach ($rResult as $aRow) {
     $row[] = $content.'<span>'.$aRow['subject'].($has_attachment?' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment:'').'</a>';    
     $row[] = $content.'<span>'.$aRow['tag_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
+    $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
     $row[] = $content.'<span>'._dt($aRow['scheduled_at']).'</span></a>';
     $row[] = $content.'<span>'._dt($aRow['date_sent']).'</span></a>';
 
@@ -77,14 +77,12 @@ foreach ($rResult as $aRow) {
 
 // Email Inbox
 $aColumns = [
-    db_prefix() . 'mail_inbox.to',
     db_prefix() . 'mail_inbox.sender_name',
     db_prefix() . 'mail_inbox.subject',
-    db_prefix() . 'mail_inbox.date_received',
-    db_prefix() . 'mail_tags.id as tag_id',
     db_prefix() . 'mail_tags.name as tag_name',
-    db_prefix() . 'emailtemplates.emailtemplateid as template_id',
     db_prefix() . 'emailtemplates.name as template_name',
+    db_prefix() . 'mail_inbox.assigned_clients',
+    db_prefix() . 'mail_inbox.date_received'
 ];
 
 $sIndexColumn = 'id';
@@ -100,17 +98,18 @@ if ($client_id) {
     array_push($where, ' AND ' . db_prefix() . 'mail_clients.client_id = ' . $client_id);
 }
 array_push($where, ' AND trash = 0');
+$group_by = ' GROUP BY ' . db_prefix() . 'mail_inbox.id';
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_inbox.id',
-    db_prefix() . 'mail_inbox.has_attachment',
     db_prefix() . 'mail_inbox.stared',
     db_prefix() . 'mail_inbox.important',
+    db_prefix() . 'mail_inbox.has_attachment',
     db_prefix() . 'mail_inbox.sender_name',
-    db_prefix() . 'mail_inbox.body',
-    db_prefix() . 'mail_inbox.read',
     db_prefix() . 'mail_inbox.subject',
+    db_prefix() . 'mail_inbox.read',
+    db_prefix() . 'mail_inbox.assigned_clients',
     db_prefix() . 'mail_inbox.date_received'
-]);
+], $group_by);
 
 $output  = $result['output'];
 $rResult = $result['rResult'];
@@ -146,7 +145,8 @@ foreach ($rResult as $aRow) {
     $row[] = $content.'<span class="'.$read.'">'.$aRow['sender_name'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].($has_attachment ? ' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment : '').'</a>';
     $row[] = $content.'<span>'.$aRow['tag_name'].'</span></a>';
-    $row[] = $content.'<span>'._dt($aRow['template_name']).'</span></a>';
+    $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
+    $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'._dt($aRow['date_received']).'</span></a>';
 
     $output['aaData'][] = $row;

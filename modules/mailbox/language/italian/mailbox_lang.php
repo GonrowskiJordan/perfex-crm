@@ -83,6 +83,7 @@ $lang['delete_mailbox_auto_reply']										= 'Elimina risposta automatica';
 $lang['mailbox_receive_template']										= 'Modello di ricezione';
 $lang['mailbox_reply_template']										    = 'Modello di risposta';
 $lang['assign_customers']											    = 'Assegnare i clienti';
+$lang['assigned_customers']											    = 'Clienti assegnati';
 $lang['assign_to_customers']											= 'Assegnare ai clienti';
 $lang['select_customers']												= 'Selezionare i clienti';
 $lang['customers_assign_successfully']									= 'Clienti assegnati con successo';

@@ -3,13 +3,14 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $aColumns = [
-    db_prefix() . 'mail_outbox.id',
-    db_prefix() . 'mail_outbox.sender_name',
+    db_prefix() . 'mail_inbox.id',
     db_prefix() . 'mail_outbox.to',
     db_prefix() . 'mail_outbox.subject',
     db_prefix() . 'mail_tags.name as tag_name',
     db_prefix() . 'emailtemplates.name as template_name',
-    db_prefix() . 'mail_outbox.scheduled_at'
+    db_prefix() . 'mail_outbox.assigned_clients',
+    db_prefix() . 'mail_outbox.scheduled_at',
+    db_prefix() . 'mail_outbox.date_sent'
 ];
 
 $sIndexColumn = 'id';
@@ -27,16 +28,18 @@ if ($group == 'draft') {
     array_push($where, ' AND draft = 0');
 }
 array_push($where, ' AND sender_staff_id = '.get_staff_user_id());
+$group_by = ' GROUP BY ' . db_prefix() . 'mail_outbox.id';
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_outbox.id',
-    db_prefix() . 'mail_outbox.has_attachment',
     db_prefix() . 'mail_outbox.stared',
     db_prefix() . 'mail_outbox.important',
+    db_prefix() . 'mail_outbox.has_attachment',
+    db_prefix() . 'mail_outbox.to',
     db_prefix() . 'mail_outbox.subject',
-    db_prefix() . 'mail_outbox.body',
-    db_prefix() . 'mail_outbox.date_sent',
-    db_prefix() . 'mail_outbox.scheduled_at'
-]);
+    db_prefix() . 'mail_outbox.assigned_clients',
+    db_prefix() . 'mail_outbox.scheduled_at',
+    db_prefix() . 'mail_outbox.date_sent'
+], $group_by);
 
 $output  = $result['output'];
 $rResult = $result['rResult'];
@@ -72,10 +75,11 @@ foreach ($rResult as $aRow) {
     if ($group == 'draft') {
         $content = '<a href="'.admin_url().'mailbox/compose/'.$aRow['id'].'">';
     }
-    $row[] = $content.'<span>'.$aRow[db_prefix() . 'mail_outbox.to'].'</span></a>';
+    $row[] = $content.'<span>'.$aRow['to'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['subject'].($has_attachment?' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment:'').'</a>';    
     $row[] = $content.'<span>'.$aRow['tag_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
+    $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
     $row[] = $content.'<span>'._dt($aRow['scheduled_at']).'</span></a>';
     $row[] = $content.'<span>'._dt($aRow['date_sent']).'</span></a>';
 

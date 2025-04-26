@@ -184,6 +184,10 @@
                                             [
                                                 'name'    => _l('email_template'),
                                                 'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-template'],
+                                            ],
+                                            [
+                                                'name'    => _l('assigned_customers'),
+                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-template'],
                                             ]
                                         ];
                                         if ('sent' == $group || 'draft' == $group) {
