@@ -21,6 +21,10 @@
                             $table_data = [
                                 _l('name'),
                                 [
+                                    'name' => _l('mailbox_color'),
+                                    'th_attrs' => ['class' => 'text-center']
+                                ],
+                                [
                                     'name' => _l('mailbox_active'),
                                     'th_attrs' => ['class' => 'text-center']
                                 ]

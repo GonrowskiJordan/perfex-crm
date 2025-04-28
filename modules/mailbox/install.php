@@ -82,6 +82,7 @@ if (!$CI->db->table_exists(db_prefix().'mail_tags')) {
   $CI->db->query('CREATE TABLE `'.db_prefix()."mail_tags` (
     `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` varchar(127) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+    `color` varchar(127) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
     `active` tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=".$CI->db->char_set.';');
@@ -164,6 +165,10 @@ if (!$CI->db->field_exists('subject', 'mail_auto_replies')) {
 
 if (!$CI->db->field_exists('body', 'mail_auto_replies')) {
   $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_auto_replies` ADD COLUMN `body` LONGTEXT NULL;');
+}
+
+if (!$CI->db->field_exists('color', 'mail_tags')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_tags` ADD COLUMN `color` VARCHAR(127) NOT NULL;');
 }
 
 if (!$CI->db->field_exists('mail_password', 'staff')) {

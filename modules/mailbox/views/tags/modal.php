@@ -24,6 +24,9 @@
             <?php $value = (isset($tag) ? $tag->name : ''); ?>
             <?= render_input('name', 'name', $value); ?>
 
+            <?php $value = (isset($tag) ? $tag->color : ''); ?>
+            <?= render_color_picker('color', _l('mailbox_color'), $value); ?>
+
             <?php $rel_id = (isset($tag) ? $tag->id : false); ?>
             <?= render_custom_fields('maibox_tags', $rel_id); ?>
 

@@ -6,6 +6,7 @@ $aColumns = [
     db_prefix() . 'mail_inbox.id',
     db_prefix() . 'mail_inbox.sender_name',
     db_prefix() . 'mail_inbox.subject',
+    db_prefix() . 'mail_inbox.body',
     db_prefix() . 'mail_tags.name as tag_name',
     db_prefix() . 'emailtemplates.name as template_name',
     db_prefix() . 'mail_inbox.assigned_clients',
@@ -38,10 +39,12 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_inbox.has_attachment',
     db_prefix() . 'mail_inbox.sender_name',
     db_prefix() . 'mail_inbox.subject',
+    db_prefix() . 'mail_inbox.body',
     db_prefix() . 'mail_inbox.read',
+    db_prefix() . 'mail_tags.color as tag_color',
     db_prefix() . 'mail_inbox.assigned_clients',
     db_prefix() . 'mail_inbox.date_received'
-], $group_by);
+], $group_by, [3]);
 
 $output  = $result['output'];
 $rResult = $result['rResult'];
@@ -52,7 +55,7 @@ foreach ($rResult as $aRow) {
     if ($aRow['read'] == 1) {
         $read = "";
     }
-    $starred = "fa-star";    
+    $starred = "fa-star";
     $msg_starred = _l('mailbox_add_star');
     $important = "fa-bookmark";
     $msg_important = _l('mailbox_mark_as_important');
@@ -77,8 +80,9 @@ foreach ($rResult as $aRow) {
 
     $content = '<a href="'.admin_url().'mailbox/inbox/'.$aRow['id'].'">';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['sender_name'].'</span></a>';
-    $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].($has_attachment ? ' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment : '').'</a>';
-    $row[] = $content.'<span>'.$aRow['tag_name'].'</span></a>';
+    $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].($has_attachment ? ' - </span>' . $has_attachment : '').'</a>';
+    $row[] = $content.text_limiter(clear_textarea_breaks($aRow['body']),10,'...').'</a>';
+    $row[] = $content.'<span style="color: '.$aRow['tag_color'].'">'.$aRow['tag_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'._dt($aRow['date_received']).'</span></a>';

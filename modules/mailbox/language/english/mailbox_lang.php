@@ -93,3 +93,4 @@ $lang['mailbox_from_to']									            = 'From - To';
 $lang['mailbox_group']									                = 'Group';
 $lang['mailbox_pattern']									            = 'Pattern';
 $lang['mailbox_body']									                = 'Body';
+$lang['mailbox_color']									                = 'Color';

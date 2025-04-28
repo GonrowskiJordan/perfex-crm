@@ -178,6 +178,10 @@
                                                 'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-subject'],
                                             ],
                                             [
+                                                'name'    => _l('mailbox_body'),
+                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-body'],
+                                            ],
+                                            [
                                                 'name'    => _l('mailbox_tag'),
                                                 'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-tag'],
                                             ],

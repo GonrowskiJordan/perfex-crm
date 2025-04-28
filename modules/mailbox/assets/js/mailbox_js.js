@@ -198,6 +198,7 @@ function view_mailbox_tag(tag_id) {
 
         init_selectpicker();
         init_datepicker();
+        init_color_pickers();
         custom_fields_hyperlink();
         validate_mailbox_tag_form();
     }).fail(function(error) {

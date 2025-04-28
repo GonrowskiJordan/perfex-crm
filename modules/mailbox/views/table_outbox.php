@@ -3,9 +3,10 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $aColumns = [
-    db_prefix() . 'mail_inbox.id',
+    db_prefix() . 'mail_outbox.id',
     db_prefix() . 'mail_outbox.to',
     db_prefix() . 'mail_outbox.subject',
+    db_prefix() . 'mail_outbox.body',
     db_prefix() . 'mail_tags.name as tag_name',
     db_prefix() . 'emailtemplates.name as template_name',
     db_prefix() . 'mail_outbox.assigned_clients',
@@ -36,17 +37,19 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_outbox.has_attachment',
     db_prefix() . 'mail_outbox.to',
     db_prefix() . 'mail_outbox.subject',
+    db_prefix() . 'mail_outbox.body',
+    db_prefix() . 'mail_tags.color as tag_color',
     db_prefix() . 'mail_outbox.assigned_clients',
     db_prefix() . 'mail_outbox.scheduled_at',
     db_prefix() . 'mail_outbox.date_sent'
-], $group_by);
+], $group_by, [3]);
 
 $output  = $result['output'];
 $rResult = $result['rResult'];
 
 foreach ($rResult as $aRow) {
     $row = [];
-    $starred = "fa-star";    
+    $starred = "fa-star";
     $msg_starred = _l('mailbox_add_star');
     $important = "fa-bookmark";
     $msg_important = _l('mailbox_mark_as_important');
@@ -56,7 +59,7 @@ foreach ($rResult as $aRow) {
     }
     if ($aRow['important'] == 1) {
         $important = "fa fa-bookmark green";
-        $msg_important = _l('mailbox_mark_as_not_important');        
+        $msg_important = _l('mailbox_mark_as_not_important');    
     }
     $has_attachment = "";
     if ($aRow['has_attachment'] > 0) {
@@ -76,8 +79,9 @@ foreach ($rResult as $aRow) {
         $content = '<a href="'.admin_url().'mailbox/compose/'.$aRow['id'].'">';
     }
     $row[] = $content.'<span>'.$aRow['to'].'</span></a>';
-    $row[] = $content.'<span>'.$aRow['subject'].($has_attachment?' - </span><span class="text-muted">'.clear_textarea_breaks(text_limiter($aRow['body'],2,'...')).'</span>'.$has_attachment:'').'</a>';    
-    $row[] = $content.'<span>'.$aRow['tag_name'].'</span></a>';
+    $row[] = $content.'<span>'.$aRow['subject'].($has_attachment ? ' - </span>' . $has_attachment : '') . '</a>';
+    $row[] = $content.text_limiter(clear_textarea_breaks($aRow['body']),10,'...').'</a>';
+    $row[] = $content.'<span style="color: '.$aRow['tag_color'].'">'.$aRow['tag_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
     $row[] = $content.'<span>'._dt($aRow['scheduled_at']).'</span></a>';

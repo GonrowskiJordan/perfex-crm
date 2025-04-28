@@ -93,3 +93,4 @@ $lang['mailbox_from_to']									            = 'Від - До';
 $lang['mailbox_group']									                = 'Група';
 $lang['mailbox_pattern']									            = 'Візерунок';
 $lang['mailbox_body']									                = 'Тіло';
+$lang['mailbox_color']									                = 'Колір';
