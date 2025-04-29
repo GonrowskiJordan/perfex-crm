@@ -8,7 +8,6 @@ $aColumns = [
     db_prefix() . 'mail_outbox.body',
     db_prefix() . 'mail_tags.name as tag_name',
     db_prefix() . 'emailtemplates.name as template_name',
-    db_prefix() . 'mail_outbox.assigned_clients',
     db_prefix() . 'mail_outbox.scheduled_at',
     db_prefix() . 'mail_outbox.date_sent'
 ];
@@ -37,7 +36,6 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_outbox.subject',
     db_prefix() . 'mail_outbox.body',
     db_prefix() . 'mail_tags.color as tag_color',
-    db_prefix() . 'mail_outbox.assigned_clients',
     db_prefix() . 'mail_outbox.scheduled_at',
     db_prefix() . 'mail_outbox.date_sent'
 ], $group_by, [3]);
@@ -68,13 +66,11 @@ foreach ($rResult as $aRow) {
 
     $row[] = $content.'<span class="'.$read.'">'._l('mailbox_outbox').'</span></a>';
     $content = '<a href="'.admin_url().'mailbox/outbox/'.$aRow['id'].'">';
+    $row[] = $content.'<span class="label" style="color: #fff; background: '.$aRow['tag_color'].'">'.$aRow['tag_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow[db_prefix() . 'mail_outbox.to'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['subject'].($has_attachment?' - </span>'.$has_attachment:'').'</a>';
     $row[] = $content.text_limiter(clear_textarea_breaks($aRow['body']),10,'...').'</a>';
-    $row[] = $content.'<span style="color: '.$aRow['tag_color'].'">'.$aRow['tag_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
-    $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
-    $row[] = $content.'<span>'._dt($aRow['scheduled_at']).'</span></a>';
     $row[] = $content.'<span>'._dt($aRow['date_sent']).'</span></a>';
 
     $output['aaData'][] = $row;
@@ -82,12 +78,11 @@ foreach ($rResult as $aRow) {
 
 // Email Inbox
 $aColumns = [
+    db_prefix() . 'mail_tags.name as tag_name',
     db_prefix() . 'mail_inbox.sender_name',
     db_prefix() . 'mail_inbox.subject',
     db_prefix() . 'mail_inbox.body',
-    db_prefix() . 'mail_tags.name as tag_name',
     db_prefix() . 'emailtemplates.name as template_name',
-    db_prefix() . 'mail_inbox.assigned_clients',
     db_prefix() . 'mail_inbox.date_received'
 ];
 
@@ -115,7 +110,6 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_inbox.body',
     db_prefix() . 'mail_tags.color as tag_color',
     db_prefix() . 'mail_inbox.read',
-    db_prefix() . 'mail_inbox.assigned_clients',
     db_prefix() . 'mail_inbox.date_received'
 ], $group_by, [3]);
 
@@ -150,12 +144,11 @@ foreach ($rResult as $aRow) {
 
     $content = '<a href="'.admin_url().'mailbox/inbox/'.$aRow['id'].'">';
     $row[] = $content.'<span class="'.$read.'">'._l('mailbox_inbox').'</span></a>';
+    $row[] = $content.'<span class="label" style="color: #fff; background: '.$aRow['tag_color'].';">'.$aRow['tag_name'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['sender_name'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].($has_attachment ? ' - </span>'.$has_attachment : '').'</a>';
     $row[] = $content.text_limiter(clear_textarea_breaks($aRow['body']),10,'...').'</a>';
-    $row[] = $content.'<span style="color: '.$aRow['tag_color'].'">'.$aRow['tag_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
-    $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'._dt($aRow['date_received']).'</span></a>';
 
     $output['aaData'][] = $row;

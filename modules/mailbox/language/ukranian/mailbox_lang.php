@@ -62,6 +62,7 @@ $lang['lead_status']													= 'Lead Status (Set to 1 for Active)';
 $lang['contacts']													    = 'Контакти';
 $lang['mailbox_emails']									                = 'Електронні листи';
 $lang['mailbox_tag']													= 'Тег поштової скриньки';
+$lang['mailbox_tag_heading']											= 'Tag';
 $lang['mailbox_tags']													= 'Теги поштових скриньок';
 $lang['new_mailbox_tag']												= 'Додати тег поштової скриньки';
 $lang['edit_mailbox_tag']												= 'Редагувати тег поштової скриньки';

@@ -62,13 +62,15 @@
         <?php } ?>
     </div>
 
-    <div class="pull-right">
-        <select class="mail-tag mbot10" data-id="<?php echo $mailbox->id; ?>" data-type="inbox">
+    <div class="pull-left">
+	    <select class="btn btn-default mail-tag mbot10" style="color :#000;" data-id="<?php echo $mailbox->id; ?>" data-type="inbox">
             <option></option>
             <?php foreach (get_mail_tags() as $mailbox_tag) { ?>
-                <option data-id="<?php echo $mailbox_tag['id'] ?>" <?php echo ($mailbox_tag['id'] == $mailbox->tagid ? 'selected' : '') ?>><?php echo $mailbox_tag['name'] ?></option>
+                <option style="text-align: left; ext-indent: 0;" data-id="<?php echo $mailbox_tag['id'] ?>" <?php echo ($mailbox_tag['id'] == $mailbox->tagid ? 'selected' : '') ?>><?php echo $mailbox_tag['name'] ?></option>
             <?php } ?>
         </select>
+    </div>
+    <div class="pull-right">
         <a class="btn btn-info mbot10" type="button" data-toggle="modal" data-target="#customers_item_modal"><i class="fa fa-user"></i> <?php echo _l('assign_customers'); ?></a>
         <a class="btn btn-danger mbot10" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data?email_subject=' . urlencode($mailbox->subject) . '&email_body=' . urlencode($mailbox->body)); ?>"><i class="fa fa-tasks"></i> <?php echo _l('assign_task'); ?></a>
         <button class="btn btn-success mbot10" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>
@@ -111,7 +113,7 @@
                                         <?php
                                             $selected = mailbox_get_client_companies($mailbox_id, 'inbox', false);
                                             if (is_admin()) {
-                                                echo render_select_with_input_group('select_customers[]', $clients, ['userid', 'company'], 'select_customers', $selected, '<div class="input-group-btn"><a href="#" class="btn btn-default" data-toggle="modal" data-target="#customer_group_modal"><i class="fa fa-plus"></i></a></div>', ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
+                                                echo render_select_with_input_group('select_customers[]', $clients, ['userid', 'company'], 'select_customers', $selected, '<div class="input-group-btn"></div>', ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
                                             } else {
                                                 echo render_select('select_customers[]', $clients, ['userid', 'company'], 'select_customers', $selected, ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
                                             }
@@ -156,7 +158,7 @@
                                 <div class="form-group">
                                     <div id="leads">
                                         <?php
-                                            $selected = [];
+                                            $selected = mailbox_get_leads($mailbox_id, 'inbox', false);
                                             if (is_admin() || get_option('staff_members_create_inline_customer_groups') == '1') {
                                                 echo render_select_with_input_group('select_lead[]', $leads, ['id', 'name'], 'select_lead', $selected, '<div class="input-group-btn"><a href="#" class="btn btn-default" data-toggle="modal" data-target="#customer_group_modal"><i class="fa fa-plus"></i></a></div>', ['multiple' => true, 'data-actions-box' => true, 'required' => true], [], '', '', false);
                                             } else {

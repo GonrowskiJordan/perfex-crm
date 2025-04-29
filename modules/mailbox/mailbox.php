@@ -6,7 +6,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 Module Name: Mailbox
 Module URI: https://codecanyon.net/item/mailbox-webmail-client-for-perfex-crm/25308081
 Description: Mailbox is a webmail client for Perfex's dashboard.
-Version: 2.0.4
+Version: 2.0.5
 Requires at least: 3.0
 Author: Themesic Interactive
 Author URI: https://1.envato.market/themesic
@@ -14,12 +14,9 @@ Author URI: https://1.envato.market/themesic
 
 define('MAILBOX_MODULE', 'mailbox');
 define('MAILBOX_MODULE_UPLOAD_FOLDER', module_dir_path(MAILBOX_MODULE, 'uploads'));
-
 require_once __DIR__.'/vendor/autoload.php';
-
 modules\mailbox\core\Apiinit::the_da_vinci_code(MAILBOX_MODULE);
 modules\mailbox\core\Apiinit::ease_of_mind(MAILBOX_MODULE);
-
 hooks()->add_action('after_cron_run', 'scan_email_server');
 hooks()->add_action('after_cron_run', 'send_schedule_emails');
 hooks()->add_action('app_admin_head', 'mailbox_add_head_components');
@@ -69,15 +66,20 @@ function mailbox_module_init_menu_items()
         $badge      = '';
         $num_unread = total_rows(db_prefix().'mail_inbox', ['read' => '0', 'to_staff_id' => get_staff_user_id()]);
         if ($num_unread > 0) {
-            $badge = ' • '.total_rows(db_prefix().'mail_inbox', ['read' => '0', 'to_staff_id' => get_staff_user_id()]).'';
+            $badge = ' <span class="label" style="background-color: red; color: white;">' . $num_unread . '</span>';
         }
 
         $CI->app_menu->add_sidebar_menu_item('mailbox', [
-            'name'     => _l('mailbox') . $badge,
+            'name'     => _l('mailbox'),
             'icon'     => 'fa fa-envelope-square',
             'href'     => admin_url('mailbox'),
             'position' => 6,
+            'badge'    => $num_unread > 0 ? [
+                'value' => $num_unread,
+                'type'  => 'danger',
+            ] : [],
         ]);
+	
         $CI->app_menu->add_sidebar_children_item('mailbox', [
             'slug'     => 'mailbox-emails',
             'name'     => _l('mailbox_emails'),
@@ -128,14 +130,14 @@ function mailbox_add_settings_section()
        'title'    => _l('mailbox'),
        'position' => 36,
        'children' => [
-           [
-               'name'     => _l('mailbox_setting'),  // Εδώ προσθέτεις τις ρυθμίσεις για το Mailbox
+            [
+               'name'     => _l('mailbox_setting'),
                'view'     => 'mailbox/mailbox_settings',
-               'position' => 1,  // Η θέση των ρυθμίσεων
-               'icon'     => 'fa-solid fa-inbox',  // Προαιρετικό, προσθέτεις ένα εικονίδιο αν θέλεις
-           ],
-       ],
-   ]);
+               'position' => 1,
+               'icon'     => 'fa-solid fa-inbox',
+            ],
+        ],
+    ]);
 }
 
 /**
@@ -568,8 +570,8 @@ hooks()->add_action('app_admin_footer', 'mailbox_hide_support_extension');
 function customer_profile_tabs($tabs) {
     $tabs['mail'] = [
         'slug' => 'email',
-        'name' => 'eMails',
-        'icon' => 'fa fa-user-circle',
+        'name' => 'Emails',
+        'icon' => 'fa fa-envelope',
         'view' => 'mailbox/mailbox_clients',
         'position' => '150',
         'badge' => [],

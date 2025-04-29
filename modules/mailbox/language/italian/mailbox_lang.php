@@ -62,6 +62,7 @@ $lang['lead_status']													= 'Lead Status (Set to 1 for Active)';
 $lang['contacts']													    = 'Contatti';
 $lang['mailbox_emails']									                = 'Email';
 $lang['mailbox_tag']													= 'Etichetta per cassetta postale';
+$lang['mailbox_tag_heading']											= 'Tag';
 $lang['mailbox_tags']													= 'Tag della casella di posta';
 $lang['new_mailbox_tag']												= 'Aggiungere un tag alla cassetta postale';
 $lang['edit_mailbox_tag']												= 'Modifica tag casella di posta';

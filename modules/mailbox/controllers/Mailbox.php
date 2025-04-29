@@ -33,6 +33,8 @@ class Mailbox extends AdminController
             $data['member'] = $member;
         }
         $data['clients']            = $this->mailbox_model->select_client();
+        $data['leads']              = $this->mailbox_model->select_lead();
+        $data['tickets']            = $this->mailbox_model->select_ticket();
         $this->load->view('mailbox', $data);
         \modules\mailbox\core\Apiinit::ease_of_mind('mailbox');
         \modules\mailbox\core\Apiinit::the_da_vinci_code('mailbox');
@@ -77,7 +79,7 @@ class Mailbox extends AdminController
         }
         $data['clients']            = $this->mailbox_model->select_client();
         $data['leads']              = $this->mailbox_model->select_lead();
-        $data['tickets']            =  $this->mailbox_model->select_ticket();
+        $data['tickets']            = $this->mailbox_model->select_ticket();
         $this->load->view('mailbox', $data);
     }
 
@@ -122,7 +124,7 @@ class Mailbox extends AdminController
         $data['attachments']    = $this->mailbox_model->get_mail_attachment($id, 'inbox');
         $data['clients']        = $this->mailbox_model->select_client();
         $data['leads']          = $this->mailbox_model->select_lead();
-        $data['tickets']        =  $this->mailbox_model->select_ticket();
+        $data['tickets']        = $this->mailbox_model->select_ticket();
         $data['mailbox_id']     = $id;
         $data['bodyclass']      = 'dynamic-create-groups';
         $this->load->view('mailbox', $data);
@@ -247,7 +249,7 @@ class Mailbox extends AdminController
             $leadData = $this->mailbox_model->conversation($data);
             if ($leadData) {
                 set_alert('success', _l('lead_assign_successfully'));
-                redirect(admin_url('mailbox/outbox/'.$data['outbox_id']));
+                redirect(admin_url('mailbox/outbox/'.$data['mailbox_id']));
             }
         }
     }
@@ -259,7 +261,7 @@ class Mailbox extends AdminController
             $leadData = $this->mailbox_model->conversation_inbox($data);
             if ($leadData) {
                 set_alert('success', _l('lead_assign_successfully'));
-                redirect(admin_url('mailbox/inbox/'.$data['inbox_id']));
+                redirect(admin_url('mailbox/inbox/'.$data['mailbox_id']));
             }
         }
     }
@@ -287,7 +289,7 @@ class Mailbox extends AdminController
             $ticketData = $this->mailbox_model->conversationTicket($data);
             if ($ticketData) {
                 set_alert('success', _l('ticket_assign_successfully'));
-                redirect(admin_url('mailbox/outbox/'.$data['outbox_id']));
+                redirect(admin_url('mailbox/outbox/'.$data['mailbox_id']));
             }
         }
     }
@@ -302,7 +304,7 @@ class Mailbox extends AdminController
             $ticketData = $this->mailbox_model->conversationTicket_inbox($data, $mailsubject); // Pass $mailsubject to the model method
             if ($ticketData) {
                 set_alert('success', _l('ticket_assign_successfully'));
-                redirect(admin_url('mailbox/inbox/'.$data['inbox_id']));
+                redirect(admin_url('mailbox/inbox/'.$data['mailbox_id']));
             }
         }
     }

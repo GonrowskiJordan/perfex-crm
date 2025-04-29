@@ -18,10 +18,14 @@
 
 <?php
     $table_data = [
-        '<span> - </span>',
+        '<span> </span>',
         [
             'name'    => _l('mailbox_group'),
             'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-group'],
+        ],
+        [
+            'name'    => _l('mailbox_tag_heading'),
+            'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-tag'],
         ],
         [
             'name'    => _l('mailbox_from_to'),
@@ -32,8 +36,8 @@
             'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-subject'],
         ],
         [
-            'name'    => _l('mailbox_tag'),
-            'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-tag'],
+            'name'    => _l('mailbox_body'),
+            'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-body', 'style'=>'width: 200px;'],
         ],
         [
             'name'    => _l('email_template'),

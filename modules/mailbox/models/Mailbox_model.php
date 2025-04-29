@@ -326,10 +326,10 @@ class Mailbox_model extends App_Model
     public function conversation($data) {
         foreach($data['select_lead'] as $value) {
             $lead_mail = [];
-            $lead_mail['outbox_id'] = $data['outbox_id'];
+            $lead_mail['outbox_id'] = $data['mailbox_id'];
             $lead_mail['lead_id'] = $value;
             $this->db->select('*');
-            $this->db->where("outbox_id", $data['outbox_id']);
+            $this->db->where("outbox_id", $data['mailbox_id']);
             $this->db->where("lead_id", $value);
             $select_data = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
             if (empty($select_data)) {
@@ -343,10 +343,10 @@ class Mailbox_model extends App_Model
     public function conversation_inbox($data) {
         foreach($data['select_lead'] as $value) {
             $lead_mail = [];
-            $lead_mail['inbox_id'] = $data['inbox_id'];
+            $lead_mail['inbox_id'] = $data['mailbox_id'];
             $lead_mail['lead_id'] = $value;
             $this->db->select('*');
-            $this->db->where("inbox_id", $data['inbox_id']);
+            $this->db->where("inbox_id", $data['mailbox_id']);
             $this->db->where("lead_id", $value);
             $select_data = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
             if (empty($select_data)) {
@@ -382,16 +382,16 @@ class Mailbox_model extends App_Model
     public function conversationTicket($data) {
         foreach($data['select_ticket'] as $value) {
             $ticket_mail = [];
-            $ticket_mail['outbox_id'] = $data['outbox_id'];
+            $ticket_mail['outbox_id'] = $data['mailbox_id'];
             $ticket_mail['ticket_id'] = $value;
             $this->db->select('*');
-            $this->db->where("outbox_id", $data['outbox_id']);
+            $this->db->where("outbox_id", $data['mailbox_id']);
             $this->db->where("ticket_id", $value);
             $select_data = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
             if (empty($select_data)) {
                $this->db->insert(db_prefix() . 'mail_conversation', $ticket_mail);
                $mail_conversation_id = $this->db->insert_id();
-            }   
+            }
         }
         return true;
     }
@@ -885,16 +885,25 @@ class Mailbox_model extends App_Model
                $this->db->insert(db_prefix() . 'mail_clients', $customer_mail);
                $mail_customer_id = $this->db->insert_id();
             }
+        }
 
-            $client_companies = mailbox_get_client_companies($data['mailbox_id'], $data['type']);
-            $this->db->where('id', $data['mailbox_id']);
-            $this->db->update(db_prefix() . 'mail_' . $data['type'], [
-                'assigned_clients' => $client_companies,
-            ]);
-            if ($this->db->affected_rows() > 0) {
-                hooks()->do_action('mailbox_assigned_customers', ['id' => $data['mailbox_id'], 'clients' => $client_companies, ]);
-                log_activity('Mailbox Assigned Customers [ID: ' . $data['mailbox_id'] . ' Client Companies: ' . $client_companies . ']');
+        $this->db->where($data['type'] . "_id", $data['mailbox_id']);
+        $mail_clients = $this->db->get(db_prefix() . 'mail_clients')->result_array();
+        foreach ($mail_clients as $mail_client) {
+            if (!in_array($mail_client['client_id'], $data['select_customers'])) {
+                $this->db->where('id', $mail_client['id']);
+                $this->db->delete(db_prefix() . 'mail_clients');
             }
+        }
+
+        $client_companies = mailbox_get_client_companies($data['mailbox_id'], $data['type']);
+        $this->db->where('id', $data['mailbox_id']);
+        $this->db->update(db_prefix() . 'mail_' . $data['type'], [
+            'assigned_clients' => $client_companies,
+        ]);
+        if ($this->db->affected_rows() > 0) {
+            hooks()->do_action('mailbox_assigned_customers', ['id' => $data['mailbox_id'], 'clients' => $client_companies, ]);
+            log_activity('Mailbox Assigned Customers [ID: ' . $data['mailbox_id'] . ' Client Companies: ' . $client_companies . ']');
         }
         return true;
     }

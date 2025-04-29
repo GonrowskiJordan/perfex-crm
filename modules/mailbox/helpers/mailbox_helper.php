@@ -242,6 +242,30 @@ function get_mail_templates($active = true)
     return $CI->db->get(db_prefix().'emailtemplates')->result_array();
 }
 
+function mailbox_get_leads($mailbox_id, $type = 'inbox', $is_string = true) {
+    $lead_names = [];
+    $lead_ids = [];
+    $CI = &get_instance();
+    $CI->db->where($type . '_id', $mailbox_id);
+    $mail_conversations = $CI->db->get(db_prefix().'mail_conversation')->result_array();
+    foreach ($mail_conversations as $mail_conversation) {
+        $CI->db->where('id', $mail_conversation['lead_id']);
+        $lead = $CI->db->get(db_prefix().'leads')->row();
+        if ($lead) {
+            if (!in_array($lead->name, $lead_names)) {
+                $lead_names[] = $lead->name;
+            }
+            if (!in_array($lead->id, $lead_ids)) {
+                $lead_ids[] = $lead->id;
+            }
+        }
+    }
+    if ($is_string) {
+        return implode(", ", $lead_names);
+    }
+    return $lead_ids;
+}
+
 function mailbox_get_client_companies($mailbox_id, $type = 'inbox', $is_string = true) {
     $client_compaies = [];
     $client_ids = [];

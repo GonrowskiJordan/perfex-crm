@@ -1,9 +1,9 @@
-.btnIcon{
+.btnIcon {
     background-color: transparent;
     padding:3px 4px;
     font-size:15px
 }
-.table-mailbox a{
+.table-mailbox a {
     color: #333333 !important;
 }
 .media:first-child {
@@ -43,7 +43,7 @@ img {
 .float-right {
     float: right!important;
 }
-@media (min-width: 768px){
+@media (min-width: 768px) {
     .d-md-flex {
         display: -ms-flexbox!important;
         display: flex!important;
@@ -54,6 +54,13 @@ img {
 }
 .d-none {
     display: none!important;
+}
+.input-group-select .input-group {
+    width: 100%;
+}
+.input-group-btn:first-child>select+.btn {
+    border-top-right-radius: .375rem !important;
+    border-bottom-right-radius: .375rem !important;
 }
 .media .media-title {
     margin-top: 0;

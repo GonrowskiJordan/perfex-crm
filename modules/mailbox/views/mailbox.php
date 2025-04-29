@@ -5,10 +5,10 @@
 <div id="wrapper">
     <div class="content" style="padding-top:50px;">
 	    <div class="row">
-            <div class="col-md-3">
-                <div class="panel_s mbot5">
+            <div class="col-md-2">
+                <div class="panel_s mbot50">
                     <div class="">
-                        <a href="<?php echo admin_url().'mailbox/compose'; ?>" class="btn btn-info display-block">
+                        <a href="<?php echo admin_url().'mailbox/compose'; ?>" class="btn btn-danger display-block">
                             <i class="fa fa-edit"></i>
                             <?php echo _l('mailbox_compose'); ?>
                         </a>
@@ -23,7 +23,7 @@
                             <?php
                                 $num_unread = total_rows(db_prefix().'mail_inbox', ['read' => '0', 'to_staff_id' => get_staff_user_id(), 'trash' => '0']);
                                 if ($num_unread > 0) { ?>
-                                    <span class="badge menu-badge bg-warning"><?php echo $num_unread; ?></span>
+                                    <span class="badge menu-badge bg-danger"><?php echo $num_unread; ?></span>
                                 <?php
                                 }  ?>
                             <?php
@@ -70,7 +70,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-10">
                 <div class="panel_s">
                     <div class="panel-body">
                         <div class="tab-content">
@@ -172,26 +172,26 @@
                                         }
                                         $_table_data = [
                                             '<span class="hide"> - </span><div class="checkbox mass_select_all_wrap"><input type="checkbox" id="mass_select_all" data-to-table="mailbox"><label></label></div>',
+											[
+                                                'name'    => _l('mailbox_tag_heading'),
+                                                'th_attrs'=> ['class'=>'toggleable p-3', 'id'=>'th-mailbox-tag', 'style'=>'width: 50px;'],
+											],
                                             $obj,
-                                            [
+											[
                                                 'name'    => _l('mailbox_subject'),
                                                 'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-subject'],
                                             ],
                                             [
                                                 'name'    => _l('mailbox_body'),
-                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-body'],
+                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-body', 'style'=>'width: 200px;'],
                                             ],
                                             [
-                                                'name'    => _l('mailbox_tag'),
-                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-tag'],
-                                            ],
-                                            [
-                                                'name'    => _l('email_template'),
-                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-template'],
+                                               'name'    => _l('email_template'),
+                                               'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-template', 'style'=>'width: 100px;'],
                                             ],
                                             [
                                                 'name'    => _l('assigned_customers'),
-                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-template'],
+                                                'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-template', 'style'=>'width: 100px;'],
                                             ]
                                         ];
                                         if ('sent' == $group || 'draft' == $group) {
