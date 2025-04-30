@@ -335,8 +335,18 @@ class Mailbox_model extends App_Model
             if (empty($select_data)) {
                $this->db->insert(db_prefix() . 'mail_conversation', $lead_mail);
                $mail_conversation_id = $this->db->insert_id();
-            }   
+            }
         }
+
+        $this->db->where("outbox_id", $data['mailbox_id']);
+        $mail_conversations = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
+        foreach ($mail_conversations as $mail_conversation) {
+            if (!in_array($mail_conversation['lead_id'], $data['select_lead'])) {
+                $this->db->where('id', $mail_conversation['id']);
+                $this->db->delete(db_prefix() . 'mail_conversation');
+            }
+        }
+
         return true;
     }
 
@@ -354,6 +364,16 @@ class Mailbox_model extends App_Model
                $mail_conversation_id = $this->db->insert_id();
             } 
         }
+
+        $this->db->where("inbox_id", $data['mailbox_id']);
+        $mail_conversations = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
+        foreach ($mail_conversations as $mail_conversation) {
+            if (!in_array($mail_conversation['lead_id'], $data['select_lead'])) {
+                $this->db->where('id', $mail_conversation['id']);
+                $this->db->delete(db_prefix() . 'mail_conversation');
+            }
+        }
+
         return true;
     }
 
@@ -375,6 +395,18 @@ class Mailbox_model extends App_Model
         $this->db->select('*');
 		$this->db->where("status", 5);
         $data = $this->db->get(db_prefix() . 'tickets')->result_array();
+
+        return $data;
+    }
+	
+    /**
+     * Tickets Data.
+     *
+     */
+    public function select_contact()
+    {
+        $this->db->select(db_prefix() . 'contacts.id, CONCAT(' . db_prefix() . 'contacts.firstname, " ", ' . db_prefix() . 'contacts.lastname) as name');
+        $data = $this->db->get(db_prefix() . 'contacts')->result_array();
 
         return $data;
     }

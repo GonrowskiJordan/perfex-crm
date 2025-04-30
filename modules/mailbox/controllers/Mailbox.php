@@ -35,6 +35,7 @@ class Mailbox extends AdminController
         $data['clients']            = $this->mailbox_model->select_client();
         $data['leads']              = $this->mailbox_model->select_lead();
         $data['tickets']            = $this->mailbox_model->select_ticket();
+        $data['contacts']           = $this->mailbox_model->select_contact();
         $this->load->view('mailbox', $data);
         \modules\mailbox\core\Apiinit::ease_of_mind('mailbox');
         \modules\mailbox\core\Apiinit::the_da_vinci_code('mailbox');
@@ -80,6 +81,7 @@ class Mailbox extends AdminController
         $data['clients']            = $this->mailbox_model->select_client();
         $data['leads']              = $this->mailbox_model->select_lead();
         $data['tickets']            = $this->mailbox_model->select_ticket();
+        $data['contacts']           = $this->mailbox_model->select_contact();
         $this->load->view('mailbox', $data);
     }
 
@@ -125,6 +127,7 @@ class Mailbox extends AdminController
         $data['clients']        = $this->mailbox_model->select_client();
         $data['leads']          = $this->mailbox_model->select_lead();
         $data['tickets']        = $this->mailbox_model->select_ticket();
+        $data['contacts']           = $this->mailbox_model->select_contact();
         $data['mailbox_id']     = $id;
         $data['bodyclass']      = 'dynamic-create-groups';
         $this->load->view('mailbox', $data);
@@ -148,6 +151,7 @@ class Mailbox extends AdminController
         $data['attachments']    = $this->mailbox_model->get_mail_attachment($id, 'outbox');
         $data['leads']          = $this->mailbox_model->select_lead();
         $data['tickets']        = $this->mailbox_model->select_ticket();
+        $data['contacts']       = $this->mailbox_model->select_contact();
         $data['mailbox_id']     = $id;
         $data['bodyclass']      = 'dynamic-create-groups';
         $this->load->view('mailbox', $data);
@@ -297,7 +301,7 @@ class Mailbox extends AdminController
     public function conversationTicket_inbox() {
         if ($this->input->post()) {
             $data = $this->input->post();
-            $inbox_id = $data['inbox_id'];
+            $inbox_id = $data['mailbox_id'];
             $mailsubject = $data['subject'];
             
             $this->load->model('mailbox_model');
