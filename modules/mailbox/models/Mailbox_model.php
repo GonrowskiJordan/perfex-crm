@@ -400,7 +400,7 @@ class Mailbox_model extends App_Model
     }
 	
     /**
-     * Tickets Data.
+     * Contacts Data.
      *
      */
     public function select_contact()
@@ -411,45 +411,78 @@ class Mailbox_model extends App_Model
         return $data;
     }
 	
-    public function conversationTicket($data) {
-        foreach($data['select_ticket'] as $value) {
-            $ticket_mail = [];
-            $ticket_mail['outbox_id'] = $data['mailbox_id'];
-            $ticket_mail['ticket_id'] = $value;
-            $this->db->select('*');
-            $this->db->where("outbox_id", $data['mailbox_id']);
-            $this->db->where("ticket_id", $value);
-            $select_data = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
-            if (empty($select_data)) {
-               $this->db->insert(db_prefix() . 'mail_conversation', $ticket_mail);
-               $mail_conversation_id = $this->db->insert_id();
+    /**
+     * Check Mailbox.
+     *
+     */
+    public function check_mailbox($id, $type)
+    {
+        $this->db->where("id", $id);
+        $mail = $this->db->get(db_prefix() . 'mail_'.$type)->row();
+        if ($mail->ticketid) {
+            $this->db->where("ticketid", $mail->ticketid);
+            $ticket = $this->db->get(db_prefix() . 'tickets')->row();
+            if (!$ticket) {
+                $this->db->where("id", $id);
+                $this->db->update(db_prefix() . 'mail_'.$type, [
+                    'ticketid' => null
+                ]);
             }
         }
-        return true;
+        if ($mail->taskid) {
+            $this->db->where("id", $mail->taskid);
+            $task = $this->db->get(db_prefix() . 'tasks')->row();
+            if (!$task) {
+                $this->db->where("id", $id);
+                $this->db->update(db_prefix() . 'mail_'.$type, [
+                    'taskid' => null
+                ]);
+            }
+        }
+    }
+	
+    /**
+     * Staffs Data.
+     *
+     */
+    public function select_staff()
+    {
+        $this->db->select(db_prefix() . 'staff.staffid, CONCAT(' . db_prefix() . 'staff.firstname, " ", ' . db_prefix() . 'staff.lastname) as name');
+        $data = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        return $data;
     }
 
-	public function conversationTicket_inbox($data, $mailsubject) {
-		$selected_customers = $this->input->post('select_customer');
-		$email_message = $data['email_message'];
-		foreach ($selected_customers as $ticketuserid) {
-			$ticket_mail = [];
-			$ticket_mail['subject'] = $mailsubject; // Use the passed $mailsubject variable
-			$ticket_mail['message'] = $_POST['email_message'];
-			$ticket_mail['status'] = 1;
-			$ticket_mail['department'] = 1;
-			$ticket_mail['priority'] = 2;
-			$this->db->select('id');
-			$this->db->where('userid', $ticketuserid);
-			$thecontactid = $this->db->get(db_prefix() . 'contacts')->row();
-			$ticket_mail['contactid'] = $thecontactid->id;
-			$ticket_mail['userid'] = $ticketuserid;
-			$ticket_mail['date'] = date("Y-m-d H:i:s");
-			$ticket_mail['assigned'] = 1;
-			$this->db->insert(db_prefix() . 'tickets', $ticket_mail);
-			$ticket_id = $this->db->insert_id();
-		}
-		
-		return true;
+	public function conversationTicket($data) {
+        $this->db->where("id", $data['mailbox_id']);
+        $mail = $this->db->get(db_prefix() . 'mail_'.$data['type'])->row();
+        
+        if ($mail) {
+            $ticket_mail = [];
+            $ticket_mail['subject'] = $mail->subject; // Use the passed $mailsubject variable
+            $ticket_mail['message'] = $mail->body;
+            $ticket_mail['status'] = 1;
+            $ticket_mail['department'] = 1;
+            $ticket_mail['priority'] = 2;
+            $this->db->select('id');
+            $this->db->where('id', $data['select_customer']);
+            $thecontactid = $this->db->get(db_prefix() . 'contacts')->row();
+            $ticket_mail['contactid'] = $thecontactid->id;
+            $ticket_mail['userid'] = $data['select_customer'];
+            $ticket_mail['date'] = date("Y-m-d H:i:s");
+            $ticket_mail['assigned'] = 1;
+            $this->db->insert(db_prefix() . 'tickets', $ticket_mail);
+            $ticket_id = $this->db->insert_id();
+    
+            $this->db->where("id", $data['mailbox_id']);
+            $this->db->update(db_prefix() . 'mail_'.$data['type'], [
+                'ticketid' => $ticket_id
+            ]);
+
+            return true;
+        }
+
+		return false;
 	}
 
     public function search_contacts($search = '', $where = [])

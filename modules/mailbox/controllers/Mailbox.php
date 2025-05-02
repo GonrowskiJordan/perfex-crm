@@ -36,6 +36,7 @@ class Mailbox extends AdminController
         $data['leads']              = $this->mailbox_model->select_lead();
         $data['tickets']            = $this->mailbox_model->select_ticket();
         $data['contacts']           = $this->mailbox_model->select_contact();
+        $data['staffs']             = $this->mailbox_model->select_staff();
         $this->load->view('mailbox', $data);
         \modules\mailbox\core\Apiinit::ease_of_mind('mailbox');
         \modules\mailbox\core\Apiinit::the_da_vinci_code('mailbox');
@@ -82,6 +83,7 @@ class Mailbox extends AdminController
         $data['leads']              = $this->mailbox_model->select_lead();
         $data['tickets']            = $this->mailbox_model->select_ticket();
         $data['contacts']           = $this->mailbox_model->select_contact();
+        $data['staffs']             = $this->mailbox_model->select_staff();
         $this->load->view('mailbox', $data);
     }
 
@@ -127,9 +129,13 @@ class Mailbox extends AdminController
         $data['clients']        = $this->mailbox_model->select_client();
         $data['leads']          = $this->mailbox_model->select_lead();
         $data['tickets']        = $this->mailbox_model->select_ticket();
-        $data['contacts']           = $this->mailbox_model->select_contact();
+        $data['contacts']       = $this->mailbox_model->select_contact();
+        $data['staffs']         = $this->mailbox_model->select_staff();
         $data['mailbox_id']     = $id;
         $data['bodyclass']      = 'dynamic-create-groups';
+
+        $this->mailbox_model->check_mailbox($id, 'inbox');
+        
         $this->load->view('mailbox', $data);
     }
 
@@ -152,8 +158,12 @@ class Mailbox extends AdminController
         $data['leads']          = $this->mailbox_model->select_lead();
         $data['tickets']        = $this->mailbox_model->select_ticket();
         $data['contacts']       = $this->mailbox_model->select_contact();
+        $data['staffs']         = $this->mailbox_model->select_staff();
         $data['mailbox_id']     = $id;
         $data['bodyclass']      = 'dynamic-create-groups';
+
+        $this->mailbox_model->check_mailbox($id, 'outbox');
+
         $this->load->view('mailbox', $data);
     }
 
@@ -293,34 +303,23 @@ class Mailbox extends AdminController
             $ticketData = $this->mailbox_model->conversationTicket($data);
             if ($ticketData) {
                 set_alert('success', _l('ticket_assign_successfully'));
-                redirect(admin_url('mailbox/outbox/'.$data['mailbox_id']));
+            } else {
+                set_alert('danger', _l('ticket_alrady_assign'));
             }
-        }
-    }
-
-    public function conversationTicket_inbox() {
-        if ($this->input->post()) {
-            $data = $this->input->post();
-            $inbox_id = $data['mailbox_id'];
-            $mailsubject = $data['subject'];
-            
-            $this->load->model('mailbox_model');
-            $ticketData = $this->mailbox_model->conversationTicket_inbox($data, $mailsubject); // Pass $mailsubject to the model method
-            if ($ticketData) {
-                set_alert('success', _l('ticket_assign_successfully'));
-                redirect(admin_url('mailbox/inbox/'.$data['mailbox_id']));
-            }
+            redirect(admin_url('mailbox/'.$data['type'].'/'.$data['mailbox_id']));
         }
     }
 
     /**
      * Create task from email
      */
-    public function insert_task_data()
+    public function assign_task()
     {
+        $mail = $this->mailbox_model->get($this->input->post('mailbox_id'), $this->input->post('type'));
+
         // Retrieve the email subject and body from GET parameters
-        $email_subject = $this->input->get('email_subject'); // Get the email subject from the URL query string
-        $email_body = $this->input->get('email_body'); // Get the email body from the URL query string
+        $email_subject = $mail->subject; // Get the email subject from the URL query string
+        $email_body = $mail->body; // Get the email body from the URL query string
 
         // Check if both subject and body are present
         if (empty($email_subject) || empty($email_body)) {
@@ -331,26 +330,40 @@ class Mailbox extends AdminController
         // Get the current staff ID (the person performing the action)
         $staff_id = get_staff_user_id(); // This retrieves the logged-in staff user ID
 
-        // Prepare task data using email subject as name and email body as description
-        $task_data = [
-            'name' => $email_subject, // Set task name as the email subject
-            'startdate' => date('Y-m-d'), // Set start date as today's date
-            'description' => $email_body, // Set task description as the email body
-        ];
+        $this->db->where("id", $mail->taskid);
+        $task = $this->db->get(db_prefix() . 'tasks')->row();
+        
+        if (!$task) {
+            // Prepare task data using email subject as name and email body as description
+            $task_data = [
+                'name' => $email_subject, // Set task name as the email subject
+                'startdate' => date('Y-m-d'), // Set start date as today's date
+                'duedate' => null, // Set start date as today's date
+                'description' => $email_body, // Set task description as the email body
+            ];
 
-        // Insert the task into the database and get the task ID
-        $task_id = $this->tasks_model->add($task_data);
+            // Insert the task into the database and get the task ID
+            $task_id = $this->tasks_model->add($task_data);
 
-        // Insert the task into the task_assigned table (assign it to the current staff)
-        $this->db->insert(db_prefix() . 'task_assigned', [
-            'taskid'        => $task_id,
-            'staffid'       => $staff_id, // Assign to the current staff member performing the action
-            'assigned_from' => $staff_id, // This also uses the current staff member as the one assigning
-        ]);
+            // Insert the task into the task_assigned table (assign it to the current staff)
+            $this->db->insert(db_prefix() . 'task_assigned', [
+                'taskid'        => $task_id,
+                'staffid'       => $this->input->post('select_customer'), // Assign to the current staff member performing the action
+                'assigned_from' => $staff_id, // This also uses the current staff member as the one assigning
+            ]);
 
-        // Optionally, return a success message and redirect
-        set_alert('success', 'Email has been converted successfully to Task');
-        redirect(admin_url('tasks')); // Redirect to the task list page
+            $this->db->where('id', $mail->id);
+            $this->db->update(db_prefix() . 'mail_'.$this->input->post('type'), [
+                'taskid' => $task_id,
+            ]);
+
+            // Optionally, return a success message and redirect
+            set_alert('success', 'Email has been converted successfully to Task');
+            redirect(admin_url('tasks')); // Redirect to the task list page
+        }
+
+        set_alert('danger', 'Email has been already converted to Task');
+        redirect(admin_url('mailbox/'.$this->input->post('type').'/'.$this->input->post('mailbox_id')));
     }
 
     public function get_recipients() {

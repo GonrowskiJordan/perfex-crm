@@ -147,6 +147,30 @@ if (!$CI->db->field_exists('assigned_clients', 'mail_outbox')) {
   $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `assigned_clients` VARCHAR(511)  DEFAULT "";');
 }
 
+if (!$CI->db->field_exists('taskid', 'mail_inbox')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_inbox` ADD COLUMN `taskid` int(11);');
+}
+
+if (!$CI->db->field_exists('taskid', 'mail_outbox')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `taskid` int(11);');
+}
+
+if (!$CI->db->field_exists('ticketid', 'mail_inbox')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_inbox` ADD COLUMN `ticketid` int(11);');
+}
+
+if (!$CI->db->field_exists('ticketid', 'mail_outbox')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `ticketid` int(11);');
+}
+
+if (!$CI->db->field_exists('conversationid', 'mail_inbox')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_inbox` ADD COLUMN `conversationid` int(11);');
+}
+
+if (!$CI->db->field_exists('conversationid', 'mail_outbox')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `conversationid` int(11);');
+}
+
 if (!$CI->db->field_exists('replyid', 'emailtemplates')) {
   $CI->db->query('ALTER TABLE `' . db_prefix() . 'emailtemplates` ADD COLUMN `replyid` int(11);');
 }

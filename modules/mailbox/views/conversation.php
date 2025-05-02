@@ -25,7 +25,7 @@
             $value['profile'] = staff_profile_image($staff_id, ['mr-2 rounded-circle']);
             $value['module_dir_url'] = module_dir_url(MAILBOX_MODULE);
             $value['date_sent'] = _dt($date_sent);
-            $value['view_url'] = admin_url().'mailbox/reply/'.$id.'/reply/outbox';
+            $value['view_url'] = admin_url().'mailbox/reply/'.$value['mail_id'].'/reply/'.($value['outbox_id']?'outbox':'inbox');
             $value['get_staff_email_by_id'] = get_staff_email_by_id($staff_id);
             if ($value['has_attachment'] > 0) {
               if ($value['outbox_id']) {
@@ -122,7 +122,7 @@
     email_top_section.classList.add("media");
     email_top_section.classList.add("mt-0");
 
-    var section = data.profile+'<div class="media-body"><div class="float-right d-md-flex fs-15"><small class="mr-2">'+ data.date_sent +'</small><small class="mr-2 cursor"><a href="'+data.view_url+'"><i class="fa fa-reply text-dark" data-toggle="tooltip" title="" data-original-title="mailbox_reply"></i></a></small></div><div class="media-title text-dark font-weight-semiblod">'+data.sender_name+' <span class="text-muted">( '+data.get_staff_email_by_id+' )</span></div><p class="mb-0 font-weight-semiblod">To: '+data.to+'</p><p class="mb-0 font-weight-semiblod">Cc: '+data.cc+'</p></div>';
+    var section = data.profile+'<div class="media-body"><div class="float-right d-md-flex fs-15"><small class="mr-2">'+ data.date_sent +'</small><small class="mr-2 cursor"><a href="'+data.view_url+'"><i class="fa fa-reply text-dark" data-toggle="tooltip" title="" data-original-title="<?php echo  _l('mailbox_reply') ?>"></i></a></small></div><div class="media-title text-dark font-weight-semiblod">'+data.sender_name+' <span class="text-muted">( '+data.get_staff_email_by_id+' )</span></div><p class="mb-0 font-weight-semiblod">To: '+data.to+'</p><p class="mb-0 font-weight-semiblod">Cc: '+data.cc+'</p></div>';
 
     email_top_section.innerHTML = section;
     $(".email-media").eq(0).html(email_top_section);

@@ -55,9 +55,9 @@
     </div>
     <div class="pull-right">
         <a class="btn btn-info mbot10" type="button" data-toggle="modal" data-target="#customers_item_modal"><i class="fa fa-user"></i> <?php echo _l('assign_customers'); ?></a>
-        <a class="btn btn-danger mbot10" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data?email_subject=' . urlencode($mailbox->subject) . '&email_body=' . urlencode($mailbox->body)); ?>"><i class="fa fa-tasks"></i> <?php echo _l('assign_task'); ?></a>
+        <a class="btn btn-danger mbot10" type="button" data-toggle="modal" data-target="#task_item_modal" <?php echo $mailbox->taskid ? "disabled" : "" ?>><i class="fa fa-tasks"></i> <?php echo _l('assign_task'); ?></a>
         <button class="btn btn-success mbot10" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>
-        <button class="btn btn-danger mbot10" type="button" data-toggle="modal" data-target="#ticket_item_modal"><i class="fa fa-life-ring"></i> <?php echo _l('assign_to_tickets'); ?></button>
+        <button class="btn btn-danger mbot10" type="button" data-toggle="modal" data-target="#ticket_item_modal" <?php echo $mailbox->ticketid ? "disabled" : "" ?>><i class="fa fa-life-ring"></i> <?php echo _l('assign_to_tickets'); ?></button>
         <a href="<?php echo admin_url().'mailbox/reply/'.$mailbox->id.'/reply/outbox'; ?>" autocomplete="off" data-loading-text="<?php echo _l('wait_text'); ?>" class="btn btn-warning mbot10">
             <i class="fa fa-reply"></i></i> <?php echo _l('mailbox_reply'); ?>
         </a>
@@ -271,13 +271,14 @@
                                     <div id="tickets">
                                         <?php
                                             $selected = [];
-                                            echo render_select('select_ticket[]', $tickets, ['ticketid', 'subject'], 'select_ticket', $selected, ['multiple' => false, 'data-actions-box' => true, 'required' => true], [], '', '', false);
+                                            echo render_select('select_customer', $contacts, ['id', 'name'], 'select_customer', $selected, ['data-actions-box' => true, 'required' => true], [], '', '', false);
                                         ?>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" >
+                        <input type="hidden" name="type" value="inbox" >
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>
@@ -292,7 +293,7 @@
 </div>
 
 <div class="modal fade" id="task_item_modal" tabindex="-1" role="dialog" aria-labelledby="taskItemModalLabel">
-    <?php echo form_open_multipart(admin_url().'mailbox/conversationTask', ['id'=>'task_assign_form']); ?>
+    <?php echo form_open_multipart(admin_url().'mailbox/assign_task', ['id'=>'task_assign_form']); ?>
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -311,22 +312,16 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <div id="tasks">
-                                        <select id="clientid" name="select_customer[]" multiple="false" data-live-search="true" data-width="100%" class="ajax-search<?php if (isset($invoice) && empty($invoice->clientid)) {echo ' customer-removed';} ?>" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                                            <?php $selected = (isset($invoice) ? $invoice->clientid : '');
-                                            if ($selected == '') {
-                                                $selected = (isset($customer_id) ? $customer_id: '');
-                                            }
-                                            if ($selected != '') {
-                                                $rel_data = get_relation_data('customer',$selected);
-                                                $rel_val = get_relation_values($rel_data,'customer');
-                                                echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
-                                            } ?>
-                                        </select>
+                                        <?php
+                                            $selected = [];
+                                            echo render_select('select_customer', $staffs, ['staffid', 'name'], 'select_customer', $selected, ['data-actions-box' => true, 'required' => true], [], '', '', false);
+                                        ?>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" >
+                        <input type="hidden" name="mailbox_id" value="<?php echo $mailbox_id ?>" />
+                        <input type="hidden" name="type" value="outbox" />
                         <div class="clearfix mbot15"></div>
                     </div>
                 </div>
