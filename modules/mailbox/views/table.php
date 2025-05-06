@@ -8,7 +8,6 @@ $aColumns = [
     db_prefix() . 'mail_inbox.sender_name',
     db_prefix() . 'mail_inbox.subject',
     db_prefix() . 'mail_inbox.body',
-    db_prefix() . 'emailtemplates.name as template_name',
     db_prefix() . 'mail_inbox.assigned_clients',
     db_prefix() . 'mail_inbox.date_received'
 ];
@@ -83,7 +82,6 @@ foreach ($rResult as $aRow) {
     $row[] = $content.'<span class="'.$read.'">'.$aRow['sender_name'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].($has_attachment ? ' - </span>' . $has_attachment : '').'</a>';
     $row[] = $content.text_limiter(clear_textarea_breaks($aRow['body']),6,'...').'</a>';
-    $row[] = $content.'<span>'.$aRow['template_name'].'</span></a>';
     $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'._dt($aRow['date_received']).'</span></a>';
 

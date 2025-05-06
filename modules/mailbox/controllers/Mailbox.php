@@ -71,6 +71,7 @@ class Mailbox extends AdminController
 
 		$data['email_templates'] = $this->emails_model->get([
             'language' => 'english',
+            'type' => 'mailbox',
             'active' => true,
         ]);
 

@@ -186,10 +186,6 @@
                                                 'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-body', 'style'=>'width: 200px;'],
                                             ],
                                             [
-                                               'name'    => _l('email_template'),
-                                               'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-template', 'style'=>'width: 100px;'],
-                                            ],
-                                            [
                                                 'name'    => _l('assigned_customers'),
                                                 'th_attrs'=> ['class'=>'toggleable', 'id'=>'th-mailbox-template', 'style'=>'width: 100px;'],
                                             ]

@@ -17,7 +17,7 @@
             </div>
         </div>
     </div>
-    <div class="eamil-body">
+    <div class="email-body mleft20 mright20 mtop20 mbot20">
         <p>
             <?php echo $mailbox->body; ?>
         </p>

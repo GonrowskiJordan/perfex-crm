@@ -67,7 +67,7 @@
       <div class="modal-body">
         <div class="">
           <div class="email-media"></div>
-          <div class="eamil-body">
+            <div class="email-body mleft20 mright20 mtop20 mbot20">
             <p id="message_body"></p>
             <hr>
             <div class="email-attch">
