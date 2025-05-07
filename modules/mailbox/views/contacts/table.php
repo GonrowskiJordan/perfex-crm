@@ -64,7 +64,7 @@ foreach ($rResult as $aRow) {
     $rowName = '<img src="' . e(contact_profile_image_url($aRow['id'])) . '" class="client-profile-image-small mright5"><a href="#"  class="tw-font-medium" onclick="contact(' . $aRow['userid'] . ',' . $aRow['id'] . ');return false;">' . e($aRow['firstname']) . '</a>';
     $rowName .= '<div class="row-options tw-ml-9">';
 
-    $rowName .= '<a href="#" onclick="view_contact(' . $aRow['userid'] . ',' . $aRow['id'] . ');return false;">' . _l('edit') . '</a>';
+    $rowName .= '<a href="#" onclick="view_contact(' . $aRow['id'] . ');return false;">' . _l('edit') . '</a>';
 
     if (is_gdpr() && get_option('gdpr_enable_consent_for_contacts') == '1' && is_admin()) {
         $rowName .= ' | <a href="' . admin_url('clients/export/' . $aRow['id']) . '">' . _l('dt_button_export') . ' (' . _l('gdpr_short') . ')</a>';

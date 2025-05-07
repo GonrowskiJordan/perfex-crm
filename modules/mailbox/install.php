@@ -94,7 +94,6 @@ if (!$CI->db->table_exists(db_prefix().'mail_auto_replies')) {
     `name` varchar(127) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
     `pattern` VARCHAR(250) NOT NULL,
     `replyid` int(11) UNSIGNED,
-    `subject` LONGTEXT NULL,
     `body` LONGTEXT NULL,
     `active` tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
@@ -183,8 +182,8 @@ if (!$CI->db->field_exists('pattern', 'mail_auto_replies')) {
   $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_auto_replies` ADD COLUMN `pattern` VARCHAR(250) NOT NULL;');
 }
 
-if (!$CI->db->field_exists('subject', 'mail_auto_replies')) {
-  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_auto_replies` ADD COLUMN `subject` LONGTEXT NULL;');
+if ($CI->db->field_exists('subject', 'mail_auto_replies')) {
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_auto_replies` DROP COLUMN `subject`;');
 }
 
 if (!$CI->db->field_exists('body', 'mail_auto_replies')) {

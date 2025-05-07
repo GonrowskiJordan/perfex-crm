@@ -5,7 +5,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $aColumns = [
     db_prefix() . 'mail_auto_replies.name',
     db_prefix() . 'mail_auto_replies.pattern',
-    db_prefix() . 'mail_auto_replies.subject',
     'reply_templates.name as reply_name',
     db_prefix() . 'mail_auto_replies.body',
     db_prefix() . 'mail_auto_replies.active',
@@ -22,7 +21,6 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     db_prefix() . 'mail_auto_replies.id',
     db_prefix() . 'mail_auto_replies.name',
     db_prefix() . 'mail_auto_replies.pattern',
-    db_prefix() . 'mail_auto_replies.subject',
     db_prefix() . 'mail_auto_replies.body',
     db_prefix() . 'mail_auto_replies.active'
 ]);
@@ -41,7 +39,6 @@ foreach ($rResult as $aRow) {
     $row[] = $nameRow;
     
     $row[] = '<span>' . $aRow['pattern'] . '</span>';
-    $row[] = '<span>' . $aRow['subject'] . '</span>';
     $row[] = '<span>'. ($aRow['reply_name'] ? $aRow['reply_name'] : substr($aRow['body'], 0, 30)) .'</span>';
     
     $outputActive = '<div class="onoffswitch">

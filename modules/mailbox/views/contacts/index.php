@@ -68,9 +68,9 @@
 
 <script>
     function contactFormHandler(form) {
-        $('#contact input[name="is_primary"]').prop('disabled', false);
+        $('#contactModal input[name="is_primary"]').prop('disabled', false);
 
-        $("#contact input[type=file]").each(function() {
+        $("#contactModal input[type=file]").each(function() {
             if ($(this).val() === "") {
                 $(this).prop('disabled', true);
             }
@@ -108,11 +108,11 @@
             if (response.proposal_warning && response.proposal_warning != false) {
                 $('body').find('#contact_proposal_warning').removeClass('hide');
                 $('body').find('#contact_update_proposals_emails').attr('data-original-email', response.original_email);
-                $('#contact').animate({
+                $('#contactModal').animate({
                     scrollTop: 0
                 }, 800);
             } else {
-                $('#contact').modal('hide');
+                $('#contactModal').modal('hide');
             }
         }).fail(function(error) {
             alert_float('danger', JSON.parse(error.responseText));

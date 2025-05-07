@@ -167,10 +167,10 @@ class Mailbox_model extends App_Model
                             $ci->db->select()->from(db_prefix() . 'emailtemplates')->where(db_prefix() . 'emailtemplates.emailtemplateid', $mail_inbox_auto_reply['replyid']);
                             $auto_reply_emailtemplate = $ci->db->get()->row();
         
-                            $ci->email->subject($auto_reply_emailtemplate->subject);
+                            $ci->email->subject("RE: " . $inbox['subject']);
                             $ci->email->message($auto_reply_emailtemplate->message);
                         } else {
-                            $ci->email->subject($mail_inbox_auto_reply['subject']);
+                            $ci->email->subject("RE: " . $inbox['subject']);
                             $ci->email->message($mail_inbox_auto_reply['body']);
                         }
                         $ci->email->send(true);
@@ -324,13 +324,14 @@ class Mailbox_model extends App_Model
     }
 
     public function conversation($data) {
-        foreach($data['select_lead'] as $value) {
+        $lead_ids = isset($data['select_lead']) ? $data['select_lead'] : [];
+        foreach($lead_ids as $lead_id) {
             $lead_mail = [];
             $lead_mail['outbox_id'] = $data['mailbox_id'];
-            $lead_mail['lead_id'] = $value;
+            $lead_mail['lead_id'] = $lead_id;
             $this->db->select('*');
             $this->db->where("outbox_id", $data['mailbox_id']);
-            $this->db->where("lead_id", $value);
+            $this->db->where("lead_id", $lead_id);
             $select_data = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
             if (empty($select_data)) {
                $this->db->insert(db_prefix() . 'mail_conversation', $lead_mail);
@@ -341,7 +342,7 @@ class Mailbox_model extends App_Model
         $this->db->where("outbox_id", $data['mailbox_id']);
         $mail_conversations = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
         foreach ($mail_conversations as $mail_conversation) {
-            if (!in_array($mail_conversation['lead_id'], $data['select_lead'])) {
+            if (!in_array($mail_conversation['lead_id'], $lead_ids)) {
                 $this->db->where('id', $mail_conversation['id']);
                 $this->db->delete(db_prefix() . 'mail_conversation');
             }
@@ -351,13 +352,14 @@ class Mailbox_model extends App_Model
     }
 
     public function conversation_inbox($data) {
-        foreach($data['select_lead'] as $value) {
+        $lead_ids = isset($data['select_lead']) ? $data['select_lead'] : [];
+        foreach($lead_ids as $lead_id) {
             $lead_mail = [];
             $lead_mail['inbox_id'] = $data['mailbox_id'];
-            $lead_mail['lead_id'] = $value;
+            $lead_mail['lead_id'] = $lead_id;
             $this->db->select('*');
             $this->db->where("inbox_id", $data['mailbox_id']);
-            $this->db->where("lead_id", $value);
+            $this->db->where("lead_id", $lead_id);
             $select_data = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
             if (empty($select_data)) {
                $this->db->insert(db_prefix() . 'mail_conversation', $lead_mail);
@@ -368,7 +370,7 @@ class Mailbox_model extends App_Model
         $this->db->where("inbox_id", $data['mailbox_id']);
         $mail_conversations = $this->db->get(db_prefix() . 'mail_conversation')->result_array();
         foreach ($mail_conversations as $mail_conversation) {
-            if (!in_array($mail_conversation['lead_id'], $data['select_lead'])) {
+            if (!in_array($mail_conversation['lead_id'], $lead_ids)) {
                 $this->db->where('id', $mail_conversation['id']);
                 $this->db->delete(db_prefix() . 'mail_conversation');
             }

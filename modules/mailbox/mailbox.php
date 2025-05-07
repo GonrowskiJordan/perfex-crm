@@ -174,9 +174,6 @@ function scan_email_server()
         $CI = &get_instance();
         $CI->db->select()->from(db_prefix() . 'staff')->where(db_prefix() . 'staff.mail_password !=', '');
         $staffs = $CI->db->get()->result_array();
-        
-        $CI->db->select()->from(db_prefix() . 'mail_auto_replies')->where(db_prefix() . 'mail_auto_replies.active', true);
-        $mail_auto_replies = $CI->db->get()->result_array();
 
         $inbox_email_ids = [];
 

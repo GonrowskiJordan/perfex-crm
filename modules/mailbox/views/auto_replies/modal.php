@@ -37,9 +37,7 @@
                     <?php } ?>
                 </select>
             </div>
-
-            <?php echo render_input('subject', 'mailbox_subject', (isset($auto_reply) ? $auto_reply->subject : '')); ?>
-
+            
             <?php echo render_textarea('body', 'mailbox_body', (isset($auto_reply) ? $auto_reply->body : ''), [], [], '', 'tinymce tinymce-auto-reply'); ?>
 
             <?php $rel_id = (isset($auto_reply) ? $auto_reply->id : false); ?>

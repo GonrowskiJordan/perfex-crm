@@ -416,6 +416,7 @@ class Mailbox extends AdminController
 			{
 				$data['phonenumber'] = '';
 			}
+			unset($data['customer_id']);
 			unset($data['contactid']);
 			if ($contact_id == '')
 			{
