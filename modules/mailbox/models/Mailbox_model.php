@@ -30,8 +30,7 @@ class Mailbox_model extends App_Model
         $outbox['cc']                   = $data['cc'];
         $outbox['sender_name']          = get_staff_full_name($staff_id);
         $outbox['subject']              = _strip_tags($data['subject']);
-        $outbox['body']                 = _strip_tags($data['body']);
-        $outbox['body']                 = nl2br_save_html($outbox['body']);
+        $outbox['body']                 = nl2br_save_html($data['body']);
         $outbox['date_sent']            = date('Y-m-d H:i:s');
         $outbox['tagid']                = $data['tagid'];
         $outbox['templateid']           = $data['templateid'];
@@ -64,8 +63,7 @@ class Mailbox_model extends App_Model
         $inbox['cc']                 = $data['cc'];
         $inbox['sender_name']        = get_staff_full_name($staff_id);
         $inbox['subject']            = _strip_tags($data['subject']);
-        $inbox['body']               = _strip_tags($data['body']);
-        $inbox['body']               = nl2br_save_html($inbox['body']);
+        $inbox['body']               = nl2br_save_html($data['body']);
         $inbox['date_received']      = date('Y-m-d H:i:s');
         $inbox['folder']             = 'inbox';
         $inbox['from_email']         = get_staff_email_by_id($staff_id);
@@ -689,6 +687,8 @@ class Mailbox_model extends App_Model
 
         $affectedRows = 0;
         $this->db->where('emailtemplateid', $id);
+        $data['fromname'] = '';
+        $data['fromemail'] = '';
         $this->db->update(db_prefix() . 'emailtemplates', $data);
         if ($this->db->affected_rows() > 0) {
             $affectedRows++;
@@ -844,6 +844,7 @@ class Mailbox_model extends App_Model
             unset($data['custom_fields']);
         }
         $data['name']                       = trim($data['name']);
+        $data['body']                       = nl2br_save_html($data['body']);
         $data                               = hooks()->apply_filters('before_create_mailbox_auto_reply', $data);
         $this->db->insert(db_prefix() . 'mail_auto_replies', $data);
         $auto_reply_id = $this->db->insert_id();
@@ -866,6 +867,7 @@ class Mailbox_model extends App_Model
      */
     public function update_auto_reply($data, $id)
     {
+        $data['body']                 = nl2br_save_html($data['body']);
         $affectedRows   = 0;
         $auto_reply     = $this->get_auto_reply($id);
         if (isset($data['custom_fields'])) {

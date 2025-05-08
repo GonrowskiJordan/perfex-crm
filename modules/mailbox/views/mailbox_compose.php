@@ -110,7 +110,7 @@
                     <i class="fa fa-file menu-icon"></i> <?php echo _l('mailbox_save_draft'); ?>
                 </button>
             <?php } ?>
-            <?php if (isset($outbox_id)) { ?>
+            <?php if (isset($mail) && !$mail->draft) { ?>
                 <a class="btn btn-info mbot10" type="button" data-toggle="modal" data-target="#customers_item_modal"><i class="fa fa-user"></i> <?php echo _l('assign_customers'); ?></a>
                 <a class="btn btn-success mbot10" type="button" data-toggle="modal" href="<?= admin_url('mailbox/insert_task_data'); ?>"><i class="fa fa-life-ring"></i> <?php echo _l('assign_task'); ?></a>
                 <button class="btn btn-succes mbot10s" type="button" data-toggle="modal" data-target="#sales_item_modal"><i class="fa fa-bullhorn"></i> <?php echo _l('assign_to_leads'); ?></button>

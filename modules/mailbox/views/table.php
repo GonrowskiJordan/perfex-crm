@@ -78,11 +78,11 @@ foreach ($rResult as $aRow) {
                 <a class="btn btnIcon" data-toggle="tooltip" title="" data-original-title="'. _l('mailbox_delete').'" onclick="update_field(\''.$group.'\',\'trash\',1,'.$aRow['id'].');"><i class="fa fa-trash grey"></i></a>';
 
     $content = '<a href="'.admin_url().'mailbox/inbox/'.$aRow['id'].'">';
-    $row[] = $content.'<span class="label" style="color: #fff; background: '.$aRow['tag_color'].';">'.$aRow['tag_name'].'</span></a>';
+    $row[] = $content.'<span class="label '.$read.'" style="color: #fff; background: '.$aRow['tag_color'].';">'.$aRow['tag_name'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['sender_name'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'.$aRow['subject'].($has_attachment ? ' - </span>' . $has_attachment : '').'</a>';
     $row[] = $content.text_limiter(clear_textarea_breaks($aRow['body']),6,'...').'</a>';
-    $row[] = $content.'<span>'.$aRow['assigned_clients'].'</span></a>';
+    $row[] = $content.'<span class="'.$read.'">'.$aRow['assigned_clients'].'</span></a>';
     $row[] = $content.'<span class="'.$read.'">'._dt($aRow['date_received']).'</span></a>';
 
     $output['aaData'][] = $row;

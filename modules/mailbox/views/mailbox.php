@@ -230,7 +230,7 @@
         init_btn_with_tooltips();
         init_tabs_scrollable();
         var webmailTableNotSortable = [0];
-        initDataTable('.table-mailbox', admin_url + 'mailbox/table/<?php echo $group; ?>', 'undefined', webmailTableNotSortable, 'undefined', [5, 'desc']);
+        initDataTable('.table-mailbox', admin_url + 'mailbox/table/<?php echo $group; ?>', 'undefined', webmailTableNotSortable, 'undefined', [6, 'desc']);
 
         appValidateForm($('#mailbox-config-form'), {
             email: 'required',

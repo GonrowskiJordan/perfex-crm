@@ -170,14 +170,6 @@ if (!$CI->db->field_exists('conversationid', 'mail_outbox')) {
   $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_outbox` ADD COLUMN `conversationid` int(11);');
 }
 
-if (!$CI->db->field_exists('replyid', 'emailtemplates')) {
-  $CI->db->query('ALTER TABLE `' . db_prefix() . 'emailtemplates` ADD COLUMN `replyid` int(11);');
-}
-
-if (!$CI->db->field_exists('autoreply', 'emailtemplates')) {
-  $CI->db->query('ALTER TABLE `' . db_prefix() . 'emailtemplates` ADD COLUMN `autoreply` tinyint(1) NOT NULL DEFAULT "0";');
-}
-
 if (!$CI->db->field_exists('pattern', 'mail_auto_replies')) {
   $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_auto_replies` ADD COLUMN `pattern` VARCHAR(250) NOT NULL;');
 }

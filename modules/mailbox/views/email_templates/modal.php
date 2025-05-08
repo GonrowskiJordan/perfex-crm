@@ -23,11 +23,6 @@
 
             <?= render_input('name', 'template_name', isset($email_template) ? $email_template->name : '', 'text'); ?>
             <?= render_input('subject[english]', 'template_subject', isset($email_template) ? $email_template->subject : ''); ?>
-            <?= render_input('fromname', 'template_fromname', isset($email_template) ? $email_template->fromname : ''); ?>
-            <div class="email-autocomplete">
-                <i class="fa-regular fa-circle-question" data-toggle="tooltip" data-title="<?= _l('email_template_only_domain_email'); ?>"></i>
-                <?= render_input('fromemail', 'template_fromemail', isset($email_template) ? $email_template->fromemail : '', 'email'); ?>
-            </div>
 
             <div style="<?= hooks()->apply_filters('show_deprecated_from_email_header_template_field', false) === false ? 'display:none;' : ''; ?>">
         </div>
@@ -45,28 +40,6 @@
             <label data-toggle="tooltip" title="<?= _l('disable_email_from_being_sent'); ?>" for="disabled">
                 <?= _l('email_template_disabled'); ?>
             </label>
-        </div>
-
-        <div class="form-group select-placeholder">
-            <label for="replyid" class="control-label"><?= _l('mailbox_reply_email_template'); ?></label>
-            <select name="replyid" data-live-search="true" id="replyid" class="form-control selectpicker" data-none-selected-text="<?= _l('dropdown_non_selected_tex'); ?>">
-                <option></option>
-                <?php foreach ($email_templates as $loop_email_template) { ?>
-                    <option value="<?= $loop_email_template['emailtemplateid']; ?>" <?= isset($email_template) && $email_template->replyid == $loop_email_template['emailtemplateid'] ? 'selected' : ''; ?>>
-                        <?= e($loop_email_template['name']); ?>
-                    </option>
-                <?php } ?>
-            </select>
-        </div>
-
-        <div class="form-group" app-field-wrapper="autoreply">
-            <label for="autoreply" class="control-label"> 
-                <?= _l('mailbox_autoreply') ?>
-            </label>
-            <div class="onoffswitch">
-                <input type="checkbox" name="autoreply" class="onoffswitch-checkbox" id="ar_<?= isset($email_template) ? $email_template->emailtemplateid : '' ?>" data-id="<?= isset($email_template) ? $email_template->emailtemplateid : '' ?>" <?= (isset($email_template) ? ($email_template->autoreply ? 'checked' : '') : 'checked') ?>>
-                <label class="onoffswitch-label" for="ar_<?= isset($email_template) ? $email_template->emailtemplateid : '' ?>"></label>
-            </div>
         </div>
 
         <hr />
