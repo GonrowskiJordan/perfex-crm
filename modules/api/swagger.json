@@ -1,0 +1,565 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Perfex CRM REST API Playground by themesic",
+        "version": "2.0.8",
+        "x-hidden-headers": ["playground"]
+    },
+    "security": [
+        {
+            "authtoken": []
+        },
+        {
+            "playground": []
+        }
+    ],
+    "paths": {
+        "/api/calendar": {
+            "get": {
+                "summary": "Get all calendar events",
+                "description": "Retrieves a list of all calendar events",
+                "tags": [
+                    "Calendar Events"
+                ],
+                "parameters": [
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CalendarEvent"
+                                    }
+                                },
+                                "examples": {
+                                    "success": {
+                                        "value": [
+                                            {
+                                                "eventid": "1",
+                                                "title": "Hello",
+                                                "description": "test",
+                                                "userid": "1",
+                                                "start": "2023-12-12 07:00:00",
+                                                "end": "2023-12-12 07:00:00",
+                                                "public": "1",
+                                                "color": "#03a9f4",
+                                                "isstartnotified": "0",
+                                                "reminder_before": "30",
+                                                "reminder_before_type": "minutes"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No events found",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": false,
+                                    "message": "No data were found"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/RateLimitExceeded"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new calendar event",
+                "description": "Adds a new event to the calendar",
+                "tags": [
+                    "Calendar Events"
+                ],
+                "parameters": [
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "title",
+                                    "start",
+                                    "reminder_before",
+                                    "reminder_before_type",
+                                    "userid",
+                                    "isstartnotified",
+                                    "public"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Team Meeting"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Test description"
+                                    },
+                                    "start": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2023/12/12 07:00"
+                                    },
+                                    "end": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2023/12/12 07:00"
+                                    },
+                                    "reminder_before": {
+                                        "type": "number",
+                                        "example": 10
+                                    },
+                                    "reminder_before_type": {
+                                        "type": "string",
+                                        "example": "minutes"
+                                    },
+                                    "color": {
+                                        "type": "string",
+                                        "example": "red"
+                                    },
+                                    "userid": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
+                                    "isstartnotified": {
+                                        "type": "number",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "example": 0
+                                    },
+                                    "public": {
+                                        "type": "number",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "example": 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Event created successfully",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": true,
+                                    "message": "Data Added Successfully"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": false,
+                                    "error": {
+                                        "title": "Title is required"
+                                    },
+                                    "message": "Validation errors"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Creation failed",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": false,
+                                    "message": "Data Creation Failed"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/calendar/{id}": {
+            "get": {
+                "summary": "Get event by ID",
+                "description": "Returns a single event by its ID",
+                "tags": [
+                    "Calendar Events"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID of the event to retrieve",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CalendarEvent"
+                                    }
+                                },
+                                "example": [
+                                    {
+                                        "eventid": "1",
+                                        "title": "Hello",
+                                        "description": "test",
+                                        "userid": "1",
+                                        "start": "2023-12-12 07:00:00",
+                                        "end": "2023-12-12 07:00:00",
+                                        "public": "1",
+                                        "color": "#03a9f4",
+                                        "isstartnotified": "0",
+                                        "reminder_before": "30",
+                                        "reminder_before_type": "minutes"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Event not found",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "notFound": {
+                                        "value": {
+                                            "status": false,
+                                            "message": "No data were found"
+                                        }
+                                    },
+                                    "invalidId": {
+                                        "value": {
+                                            "status": false,
+                                            "message": "Invalid ID"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update an event",
+                "description": "Updates an existing calendar event",
+                "tags": [
+                    "Calendar Events"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID of the event to update",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Updated Meeting"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated description"
+                                    },
+                                    "start": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2023/12/12 08:00"
+                                    },
+                                    "end": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2023/12/12 09:00"
+                                    },
+                                    "reminder_before": {
+                                        "type": "number",
+                                        "example": 15
+                                    },
+                                    "reminder_before_type": {
+                                        "type": "string",
+                                        "example": "minutes"
+                                    },
+                                    "color": {
+                                        "type": "string",
+                                        "example": "blue"
+                                    },
+                                    "userid": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
+                                    "isstartnotified": {
+                                        "type": "number",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "example": 1
+                                    },
+                                    "public": {
+                                        "type": "number",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "example": 0
+                                    }
+                                }
+                            },
+                            "example": {
+                                "title": "Hello",
+                                "start": "2023/12/12 07:00",
+                                "end": "2023/12/12 07:00",
+                                "reminder_before": "10",
+                                "reminder_before_type": "minutes",
+                                "color": "red",
+                                "description": "for test",
+                                "userid": 6,
+                                "public": 1,
+                                "isstartnotified": 1
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Event updated successfully",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": true,
+                                    "message": "Data Update Successful."
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": false,
+                                    "message": "Data Not Acceptable OR Not Provided"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Update failed",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": false,
+                                    "message": "Data Update Fail."
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete an event",
+                "description": "Deletes a calendar event by ID",
+                "tags": [
+                    "Calendar Events"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID of the event to delete",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Event deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": true,
+                                    "message": "Data Deleted Successfully"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Deletion failed",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "notFound": {
+                                        "value": {
+                                            "status": false,
+                                            "message": "Delete Fail."
+                                        }
+                                    },
+                                    "invalidId": {
+                                        "value": {
+                                            "status": false,
+                                            "message": "Invalid ID"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CalendarEvent": {
+                "type": "object",
+                "properties": {
+                    "eventid": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Hello"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "test"
+                    },
+                    "userid": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "start": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-12-12 07:00:00"
+                    },
+                    "end": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-12-12 07:00:00"
+                    },
+                    "public": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "color": {
+                        "type": "string",
+                        "example": "#03a9f4"
+                    },
+                    "isstartnotified": {
+                        "type": "string",
+                        "example": "0"
+                    },
+                    "reminder_before": {
+                        "type": "string",
+                        "example": "30"
+                    },
+                    "reminder_before_type": {
+                        "type": "string",
+                        "example": "minutes"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "RateLimitExceeded": {
+                "description": "Too many requests",
+                "headers": {
+                    "X-RateLimit-Limit": {
+                        "description": "Request limit per minute",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "X-RateLimit-Remaining": {
+                        "description": "Remaining requests in current window",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "X-RateLimit-Reset": {
+                        "description": "UTC timestamp when rate limit resets",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    "Retry-After": {
+                        "description": "Seconds to wait before next request",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "Rate limit exceeded",
+                            "message": "You have exceeded your 100 requests per minute limit.",
+                            "retryAfter": 30
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "authtoken": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "authtoken",
+                "description": "Authentication token from admin area"
+            },
+            "playground": {
+                "type": "string",
+                "default": "yes",
+                "in": "header",
+                "name": "playground",
+                "description": "For API Test",
+                "x-hidden": true
+            }
+        }
+    },
+    "x-quota": {
+        "dailyLimit": 1000,
+        "monthlyLimit": 30000,
+        "perUser": true
+    }
+}

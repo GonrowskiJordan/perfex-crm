@@ -283,6 +283,7 @@ function check_email_template() {
         }).done(function(response) {
             response = JSON.parse(response);
             
+            $('#mailbox-compose-form [name="subject"]').val(response.subject);
             tinymce.get('body').setContent(response.message);
         }).fail(function(error) {
             alert_float('danger', JSON.parse(error.responseText));
@@ -303,6 +304,7 @@ function check_auto_reply_template() {
         }).done(function(response) {
             response = JSON.parse(response);
             
+            $('#mailbox-auto-reply-form [name="subject"]').val(response.subject);
             tinymce.get('body').setContent(response.message);
         }).fail(function(error) {
             alert_float('danger', JSON.parse(error.responseText));

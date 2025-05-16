@@ -27,9 +27,9 @@ $config['api_timezone'] = 'Europe/London';
 /**
  * API Limit database table name
  */
-$config['api_limit_table_name'] = 'api_limit';
+$config['api_limit_table_name'] = 'user_api_limit';
 
 /**
  * API keys database table name 
  */
-$config['api_keys_table_name'] = 'api_keys';
+$config['api_keys_table_name'] = 'user_api';

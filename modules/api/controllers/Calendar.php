@@ -1,4 +1,5 @@
 <?php
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 require __DIR__ . '/REST_Controller.php';
@@ -90,8 +91,8 @@ class Calendar extends REST_Controller
      *         "status": false,
      *         "message": "No data were found"
      *     }
-     */
-    public function data_get($id = '')
+     */    
+     public function data_get($id = '')
     {
         $data = $this->Api_model->get_table('events', $id);
 
@@ -245,6 +246,7 @@ class Calendar extends REST_Controller
             }
         }
     }
+
     /**
      * @api {delete} api/calendar/:id Delete a Calendar Event
      * @apiVersion 0.3.0
@@ -267,8 +269,7 @@ class Calendar extends REST_Controller
      *       "status": false,
      *       "message": "Data Delete Fail"
      *     }
-     */
- 
+     */ 
     public function data_delete($id = '')
     {
         $id = $this->security->xss_clean($id);

@@ -90,6 +90,8 @@ class API_Controller extends CI_Controller
 
         // set timezone for api limit
         date_default_timezone_set($this->CI->config->item('api_timezone'));
+        
+        $this->load->library('app_modules');
 
         // Load Config Items Values
         $this->API_LIMIT_TABLE_NAME = $this->CI->config->item('api_limit_table_name');

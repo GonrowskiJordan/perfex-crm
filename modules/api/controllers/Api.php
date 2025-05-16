@@ -29,11 +29,6 @@ class Api extends AdminController
         $this->load->view('api_management', $data);
     }
 
-    public function api_guide()
-    { 
-        fopen(APP_MODULES_PATH . 'api/views/apidoc/index.html', 'r');
-    }
-
     /* Add new user or update existing*/
     public function user()
     {

@@ -199,7 +199,7 @@ if (!$CI->db->field_exists('last_email_check', 'staff')) {
 }
 
 if (!$CI->db->field_exists('inbox_id', 'mail_conversation')) {
-  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_conversation` ADD COLUMN `inbox_id` int(255) DEFAULT NULL');
+  $CI->db->query('ALTER TABLE `' . db_prefix() . 'mail_conversation` ADD COLUMN `inbox_id` int(11) DEFAULT NULL');
 }
 
 // Moving necessary dependencies to the correct place for clean installs of v2.7.0+

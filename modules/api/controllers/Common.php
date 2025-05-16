@@ -4,6 +4,12 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 require __DIR__.'/REST_Controller.php';
 
+/**
+ * @OA\Tag(
+ *     name="Common",
+ *     description="Common API endpoints"
+ * )
+ */
 class Common extends REST_Controller {
     public function __construct()
     {
@@ -167,7 +173,6 @@ class Common extends REST_Controller {
      *       "message": "No data were found"
      *     }
      */
-
     public function tax_data()
     {
     	$this->load->model('taxes_model');

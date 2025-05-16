@@ -365,6 +365,117 @@ abstract class REST_Controller extends CI_Controller {
     }
 
     /**
+     * Limit Method
+     * ------------------------
+     * @param: {int} number
+     * @param: {type} ip
+     * 
+     * Total Number Limit without Time
+     * 
+     * @param: {minute} time/everyday
+     * Total Number Limit with Last {3,4,5...} minute
+     * --------------------------------------------------------
+     */
+    protected function _limit_method(array $data)
+    {
+        // check limit database table exists
+        if (!$this->db->table_exists($this->CI->config->item('api_limit_table_name'))) {
+            $this->_response(['status' => FALSE, 'error' => 'Create API Limit Database Table'], self::HTTP_BAD_REQUEST);
+        }
+
+        $limit_num = $data[0]; // limit number
+        $limit_type = $data[1]; // limit type
+
+        $limit_time = isset($data[2]) ? $data[2] : ''; // time minute
+
+        if ($limit_type == 'ip')
+        {
+            $where_data_ip = [
+                'uri' => $this->CI->uri->uri_string(),
+                'class' => $this->CI->router->fetch_class(),
+                'method' => $this->CI->router->fetch_method(),
+                'ip_address' => $this->CI->input->ip_address(),
+            ];
+
+            $limit_query = $this->CI->db->get_where($this->CI->config->item('api_limit_table_name'), $where_data_ip);
+            if ($this->db->affected_rows() >= $limit_num)
+            {
+                // time limit not empty
+                if (isset($limit_time) AND !empty($limit_time))
+                {
+                    // if time limit `numeric` numbers
+                    if (is_numeric($limit_time))
+                    {
+                        $limit_timestamp = time() - ($limit_time*60);
+                        // echo Date('d/m/Y h:i A', $times);
+    
+                        $where_data_ip_with_time = [
+                            'uri' => $this->CI->uri->uri_string(),
+                            'class' => $this->CI->router->fetch_class(),
+                            'method' => $this->CI->router->fetch_method(),
+                            'ip_address' => $this->CI->input->ip_address(),
+                            'time >=' => $limit_timestamp
+                        ];
+    
+                        $time_limit_query = $this->CI->db->get_where($this->API_LIMIT_TABLE_NAME, $where_data_ip_with_time);
+                        // echo $this->CI->db->last_query();
+                        if ($this->db->affected_rows() >= $limit_num)
+                        {
+                            $this->_response(['status' => FALSE, 'error' => 'This IP Address has reached the time limit for this method'], self::HTTP_REQUEST_TIMEOUT);
+                        } else
+                        {
+                            // insert limit data
+                            $this->limit_data_insert();
+                        }
+                    }
+
+                    // if time limit equal to `everyday`
+                    if ($limit_time == 'everyday')
+                    {
+                        $this->CI->load->helper('date');
+
+                        $bad_date = mdate('%d-%m-%Y', time());
+
+                        $start_date = nice_date($bad_date .' 12:00 AM', 'd-m-Y h:i A'); // {DATE} 12:00 AM
+                        $end_date = nice_date($bad_date .' 12:00 PM', 'd-m-Y h:i A'); // {DATE} 12:00 PM
+                        
+                        $start_date_timestamp = strtotime($start_date);
+                        $end_date_timestamp = strtotime($end_date);
+                       
+                        $where_data_ip_with_time = [
+                            'uri' => $this->CI->uri->uri_string(),
+                            'class' => $this->CI->router->fetch_class(),
+                            'method' => $this->CI->router->fetch_method(),
+                            'ip_address' => $this->CI->input->ip_address(),
+                            'time >=' => $start_date_timestamp,
+                            'time <=' => $end_date_timestamp,
+                        ];
+    
+                        $time_limit_query = $this->CI->db->get_where($this->API_LIMIT_TABLE_NAME, $where_data_ip_with_time);
+                        // echo $this->CI->db->last_query();exit;
+                        if ($this->db->affected_rows() >= $limit_num)
+                        {                            
+                            $this->response([$this->config->item('rest_status_field_name') => FALSE, $this->config->item('rest_message_field_name') => $this->lang->line('text_rest_unauthorized') ], self::HTTP_UNAUTHORIZED);
+                            $this->_response(['status' => FALSE, 'error' => 'This IP Address has reached the time limit for this method'], self::HTTP_REQUEST_TIMEOUT);
+                        } else {
+                            // insert limit data
+                            $this->limit_data_insert();
+                        }
+                    }
+                } else {
+                    $this->_response(['status' => FALSE, 'error' => 'This IP Address has reached limit for this method'], self::HTTP_REQUEST_TIMEOUT);
+                }
+
+            } else {
+                // insert limit data
+                $this->limit_data_insert();
+            }
+        } else {
+            $this->_response(['status' => FALSE, 'error' => 'Limit Type Invalid'], self::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
      * Constructor for the REST API
      *
      * @access public
@@ -471,6 +582,9 @@ abstract class REST_Controller extends CI_Controller {
         if ($this->{'_' . $this->request->method . '_args'} === null) {
             $this->{'_' . $this->request->method . '_args'} = [];
         }
+        
+        // api limit function `_limit_method()`
+        $this->_limit_method();
 
         // Now we know all about our request, let's try and parse the body if it exists
         if ($this->request->format && $this->request->body) {

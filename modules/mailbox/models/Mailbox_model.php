@@ -114,24 +114,26 @@ class Mailbox_model extends App_Model
 
         // Send email
         if (strlen(get_option('smtp_host')) > 0 && strlen(get_option('smtp_password')) > 0 && strlen(get_option('smtp_username')) > 0) {
-            $ci = &get_instance();
-            $ci->email->initialize();
-            $ci->load->library('email');
-            $ci->email->clear(true);
-            $ci->email->from($inbox['from_email'], $inbox['sender_name']);
-            $ci->email->to(str_replace(';', ',', $data['to']));
-            if (isset($data['cc']) && strlen($data['cc']) > 0) {
-                $ci->email->cc($data['cc']);
-            }
-            $ci->email->subject($inbox['subject']);
-            $ci->email->message($data['body']);
-            if (isset($attachments) && $attachments && count($attachments)) {
-                foreach ($attachments as $attachment) {
-                    $attachment_url = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$outbox_id.'/'.$attachment['file_name'];
-                    $ci->email->attach($attachment_url);
+            if (!$outbox['scheduled_at']) {
+                $ci = &get_instance();
+                $ci->email->initialize();
+                $ci->load->library('email');
+                $ci->email->clear(true);
+                $ci->email->from($inbox['from_email'], $inbox['sender_name']);
+                $ci->email->to(str_replace(';', ',', $data['to']));
+                if (isset($data['cc']) && strlen($data['cc']) > 0) {
+                    $ci->email->cc($data['cc']);
                 }
+                $ci->email->subject($inbox['subject']);
+                $ci->email->message($data['body']);
+                if (isset($attachments) && $attachments && count($attachments)) {
+                    foreach ($attachments as $attachment) {
+                        $attachment_url = module_dir_url(MAILBOX_MODULE).'uploads/outbox/'.$outbox_id.'/'.$attachment['file_name'];
+                        $ci->email->attach($attachment_url);
+                    }
+                }
+                $ci->email->send(true);
             }
-            $ci->email->send(true);
         
             // Auto Reply
             $ci->db->select()->from(db_prefix() . 'mail_auto_replies')->where(db_prefix() . 'mail_auto_replies.active', true);
